@@ -58,7 +58,7 @@ class OnBoardingScreen extends StatefulWidget {
                               return WelcomePage();
                             }));
                       },
-                      child: Text('Login'),
+                      child: Text('Welcome'),
                       )
 
                       : GestureDetector(

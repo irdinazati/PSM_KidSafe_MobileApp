@@ -20,9 +20,9 @@ class _ForgotPasswordState extends State<ForgotPassword> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.lightGreen[100],
+      backgroundColor: Colors.purple[50], // Set the background color
       appBar: AppBar(
-          backgroundColor: (Colors.lightGreen[100])
+          backgroundColor: (Colors.purple[100])
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -66,7 +66,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                       prefixIcon: Icon(Icons.email),
                       enabledBorder: OutlineInputBorder(
                         borderSide: const BorderSide(
-                            width: 3, color: Colors.purpleAccent),
+                            width: 3, color: Colors.purple),
                         borderRadius: BorderRadius.circular(50.0),
                       ),
                     ),
@@ -79,7 +79,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                       style: ButtonStyle(
                         foregroundColor: MaterialStateProperty.all(Colors.white),
                         backgroundColor: MaterialStateProperty.all(
-                            Colors.purple[900]),
+                            Colors.purple[500]),
                       ),
                       onPressed: () async{
                         var forgotEmail = forgotPasswordController.text.trim();

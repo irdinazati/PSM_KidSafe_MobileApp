@@ -23,9 +23,9 @@ class _ReactivateScreenState extends State<ReactivateScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.lightGreen[100],
+      backgroundColor: Colors.purple[50], // Set the background color
       appBar: AppBar(
-          backgroundColor: (Colors.lightGreen[100])
+          backgroundColor: (Colors.purple[100])
       ),
       body: SingleChildScrollView(
         child: Column(

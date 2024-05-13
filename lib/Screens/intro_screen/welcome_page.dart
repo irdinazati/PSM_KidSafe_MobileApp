@@ -8,8 +8,9 @@ class WelcomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.purple[50], // Set the background color
       body: SafeArea(
-        child: SingleChildScrollView( // Wrap the main content in SingleChildScrollView
+        child: SingleChildScrollView(
           child: Container(
             width: double.infinity,
             height: MediaQuery.of(context).size.height,
@@ -60,7 +61,8 @@ class WelcomePage extends StatelessWidget {
                         minWidth: double.infinity,
                         height: 60,
                         onPressed: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => LoginPage()));
+                          Navigator.push(context, MaterialPageRoute(builder:
+                              (context) => LoginPage()));
                         },
                         shape: RoundedRectangleBorder(
                           side: BorderSide(color: Colors.black),
@@ -93,9 +95,10 @@ class WelcomePage extends StatelessWidget {
                           minWidth: double.infinity,
                           height: 60,
                           onPressed: () {
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => SignupPage()));
+                            Navigator.push(context, MaterialPageRoute(builder:
+                                (context) => SignupPage()));
                           },
-                          color: Colors.purple[200],
+                          color: Color(0xFFBEC4ED),
                           elevation: 0,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(50),

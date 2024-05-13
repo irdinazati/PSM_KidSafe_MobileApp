@@ -3,7 +3,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:fyp3/Constants/Constants.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -34,6 +33,7 @@ class _ParentEditProfileState extends State<ParentEditProfile> {
   bool _obscurePassword1 = true;
   bool _obscurePassword2 = true;
 
+  // Fetch parent data from Firestore
   Future<Map<String, dynamic>> _fetchParentData() async {
     User? parent = _auth.currentUser;
 
@@ -45,16 +45,23 @@ class _ParentEditProfileState extends State<ParentEditProfile> {
         if (documentSnapshot.exists) {
           Map<String, dynamic> parentData =
           documentSnapshot.data() as Map<String, dynamic>;
-          parentData['parentProfilePicture'] =
-              parentData['parentProfilePicture'] ?? '';
+          parentData['profilePicture'] = parentData['profilePicture'] ?? '';
           parentData['parentName'] = parentData['parentName'] ?? '';
           parentData['parentFullName'] = parentData['parentFullName'] ?? '';
           parentData['parentPassword'] = parentData['parentPassword'] ?? '';
-          parentData['parentRePassword'] =
-              parentData['parentRePassword'] ?? '';
+          parentData['parentRePassword'] = parentData['parentRePassword'] ?? '';
           parentData['parentPhoneNumber'] =
               parentData['parentPhoneNumber'] ?? '';
           parentData['role'] = parentData['role'] ?? '';
+
+          // Update text controllers with fetched data
+          parentNameController.text = parentData['parentName'];
+          parentFullNameController.text = parentData['parentFullName'];
+          parentPhoneController.text = parentData['parentPhoneNumber'];
+          parentEmailController.text = parentData['parentEmail'];
+          parentPasswordController.text = parentData['parentPassword'];
+          parentRePasswordController.text = parentData['parentRePassword'];
+
           return parentData;
         } else {
           print('Document does not exist');
@@ -108,10 +115,10 @@ class _ParentEditProfileState extends State<ParentEditProfile> {
           await _firestore
               .collection('parents')
               .doc(parent.uid)
-              .update({'parentProfilePicture': profilePictureURL});
+              .update({'profilePicture': profilePictureURL});
         }
 
-        // Update other profile information
+        // Update all profile information
         await _firestore.collection('parents').doc(parent.uid).update({
           'parentName': parentNameController.text,
           'parentFullName': parentFullNameController.text,
@@ -119,18 +126,6 @@ class _ParentEditProfileState extends State<ParentEditProfile> {
           'parentEmail': parentEmailController.text,
           'parentPassword': parentPasswordController.text,
           'parentRePassword': parentRePasswordController.text,
-        });
-
-        // Fetch updated data for the UI
-        Map<String, dynamic> updatedData = await _fetchParentData();
-        setState(() {
-          // Update UI with the fetched data
-          parentNameController.text = updatedData['parentName'];
-          parentFullNameController.text = updatedData['parentFullName'];
-          parentPhoneController.text = updatedData['parentPhoneNumber'];
-          parentEmailController.text = updatedData['parentEmail'];
-          parentPasswordController.text = updatedData['parentPassword'];
-          parentRePasswordController.text = updatedData['parentRePassword'];
         });
 
         // Show success message or navigate to a different screen
@@ -144,211 +139,165 @@ class _ParentEditProfileState extends State<ParentEditProfile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.green[50],
-        appBar: AppBar(
-          backgroundColor: KidSafeColor2,
-
-          title: Center(
-              child: Text("Parent Update Profile",
-                  style: Theme.of(context).textTheme.headlineLarge)),
+      appBar: AppBar(
+        backgroundColor: Colors.purple[200],
+        title: Text(
+          "Parent Update Profile",
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+          textAlign: TextAlign.left, // Align text to the left
         ),
-        body: SingleChildScrollView(
-            child: Container(
-              padding: const EdgeInsets.all(20.0),
-              child: FutureBuilder<Map<String, dynamic>>(
-                  future: _fetchParentData(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Center(child: CircularProgressIndicator());
-
-                    } else if (snapshot.hasError) {
-                      return Text('Error: ${snapshot.error}');
-                    } else {
-                      String parentName = snapshot.data?['parentName'] ?? '';
-                      String parentFullName = snapshot.data?['parentFullName'] ?? '';
-                      String parentEmail = snapshot.data?['parentEmail'] ?? '';
-                      String parentPhoneNumber =
-                          snapshot.data?['parentPhoneNumber'] ?? '';
-                      String parentPassword = snapshot.data?['parentPassword'] ?? '';
-                      String parentRePassword =
-                          snapshot.data?['parentRePassword'] ?? '';
-                      return Column(
-                        children: [
-                          Stack(
-                            children: [
-                              SizedBox(
-                                width: 120,
-                                height: 120,
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(100),
-                                  child: Image.network(
-                                    snapshot.data?['parentProfilePicture'] ?? '',
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                bottom: 0,
-                                right: 0,
-                                child: Container(
-                                  width: 35,
-                                  height: 35,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(100),
-                                    color: Colors.amberAccent,
-                                  ),
-                                  child: IconButton(
-                                    icon: Icon(Icons.add_photo_alternate),
-                                    onPressed: _pickImage,
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
-                          const SizedBox(height: 20),
-                          Form(
-                            child: Padding(
-                              padding: const EdgeInsets.all(10.0),
-                              child: TextFormField(
-                                decoration: InputDecoration(
-                                  enabledBorder: OutlineInputBorder(
-                                    borderSide: const BorderSide(
-                                        width: 2, color: Colors.black),
-                                    borderRadius: BorderRadius.circular(50.0),
-                                  ),
-                                  prefixIcon: const Icon(Icons.person_outline),
-                                  hintText: parentFullName,
-                                ),
-                                controller: parentFullNameController,
-                              ),
+      ),
+      body: SingleChildScrollView(
+        child: Container(
+          padding: const EdgeInsets.all(20.0),
+          child: FutureBuilder<Map<String, dynamic>>(
+            future: _fetchParentData(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(child: CircularProgressIndicator());
+              } else if (snapshot.hasError) {
+                return Text('Error: ${snapshot.error}');
+              } else {
+                String parentName = snapshot.data?['parentName'] ?? '';
+                String parentFullName =
+                    snapshot.data?['parentFullName'] ?? '';
+                String parentEmail = snapshot.data?['parentEmail'] ?? '';
+                String parentPhoneNumber =
+                    snapshot.data?['parentPhoneNumber'] ?? '';
+                String parentPassword = snapshot.data?['parentPassword'] ?? '';
+                String parentRePassword =
+                    snapshot.data?['parentRePassword'] ?? '';
+                return Column(
+                  children: [
+                    Stack(
+                      children: [
+                        SizedBox(
+                          width: 120,
+                          height: 120,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(100),
+                            child: Image.network(
+                              snapshot.data?['profilePicture'] ?? '',
                             ),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.all(10.0),
-                            child: TextFormField(
-                              decoration: InputDecoration(
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide: const BorderSide(
-                                      width: 2, color: Colors.black),
-                                  borderRadius: BorderRadius.circular(50.0),
-                                ),
-                                prefixIcon: const Icon(Icons.person_outline),
-                                hintText: parentName,
-                              ),
-                              controller: parentNameController,
+                        ),
+                        Positioned(
+                          bottom: 0,
+                          right: 0,
+                          child: Container(
+                            width: 35,
+                            height: 35,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(100),
+                              color: Colors.amberAccent,
+                            ),
+                            child: IconButton(
+                              icon: Icon(Icons.add_photo_alternate),
+                              onPressed: _pickImage,
                             ),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.all(10.0),
-                            child: TextFormField(
-                              decoration: InputDecoration(
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide: const BorderSide(
-                                      width: 2, color: Colors.black),
-                                  borderRadius: BorderRadius.circular(50.0),
-                                ),
-                                prefixIcon: const Icon(Icons.phone_iphone_outlined),
-                                hintText: parentPhoneNumber,
-                              ),
-                              keyboardType: TextInputType.phone,
-                              controller: parentPhoneController,
-                            ),
+                        )
+                      ],
+                    ),
+                    SizedBox(height: 20),
+                    TextFormField(
+                      decoration: InputDecoration(
+                        labelText: 'Full Name',
+                        hintText: parentFullName,
+                      ),
+                      controller: parentFullNameController,
+                    ),
+                    TextFormField(
+                      decoration: InputDecoration(
+                        labelText: 'Name',
+                        hintText: parentName,
+                      ),
+                      controller: parentNameController,
+                    ),
+                    TextFormField(
+                      decoration: InputDecoration(
+                        labelText: 'Phone Number',
+                        hintText: parentPhoneNumber,
+                      ),
+                      keyboardType: TextInputType.phone,
+                      controller: parentPhoneController,
+                    ),
+                    TextFormField(
+                      decoration: InputDecoration(
+                        labelText: 'Email',
+                        hintText: parentEmail,
+                      ),
+                      keyboardType: TextInputType.emailAddress,
+                      controller: parentEmailController,
+                    ),
+                    TextFormField(
+                      obscureText: _obscurePassword1, // Toggle password visibility
+                      decoration: InputDecoration(
+                        labelText: 'Password',
+                        hintText: '********',
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _obscurePassword1
+                                ? Icons.visibility
+                                : Icons.visibility_off,
+                            color: Theme.of(context).primaryColor,
                           ),
-                          Padding(
-                            padding: const EdgeInsets.all(10.0),
-                            child: TextFormField(
-                              decoration: InputDecoration(
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide: const BorderSide(
-                                      width: 2, color: Colors.black),
-                                  borderRadius: BorderRadius.circular(50.0),
-                                ),
-                                prefixIcon: const Icon(Icons.email_outlined),
-                                hintText: parentEmail,
-                              ),
-                              keyboardType: TextInputType.emailAddress,
-                              controller: parentEmailController,
-                            ),
+                          onPressed: () {
+                            setState(() {
+                              _obscurePassword1 = !_obscurePassword1;
+                            });
+                          },
+                        ),
+                      ),
+                      controller: parentPasswordController,
+                    ),
+                    TextFormField(
+                      obscureText: _obscurePassword2, // Toggle password visibility
+                      decoration: InputDecoration(
+                        labelText: 'Re-enter Password',
+                        hintText: '********',
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _obscurePassword2
+                                ? Icons.visibility
+                                : Icons.visibility_off,
+                            color: Theme.of(context).primaryColor,
                           ),
-                          Padding(
-                            padding: const EdgeInsets.all(10.0),
-                            child: TextFormField(
-                              obscureText: _obscurePassword1,
-                              keyboardType: TextInputType.visiblePassword,
-                              decoration: InputDecoration(
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide: const BorderSide(
-                                      width: 2, color: Colors.black),
-                                  borderRadius: BorderRadius.circular(50.0),
-                                ),
-                                prefixIcon: const Icon(Icons.password_outlined),
-                                suffixIcon: IconButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      _obscurePassword1 = !_obscurePassword1;
-                                    });
-                                  },
-                                  icon: _obscurePassword1
-                                      ? const Icon(Icons.visibility_off_outlined)
-                                      : const Icon(Icons.visibility_outlined),
-                                ),
-                                hintText: "Enter New Password",
-                              ),
-                              controller: parentPasswordController,
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(10.0),
-                            child: TextFormField(
-                              obscureText: _obscurePassword2,
-                              keyboardType: TextInputType.visiblePassword,
-                              decoration: InputDecoration(
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide: const BorderSide(
-                                      width: 2, color: Colors.black),
-                                  borderRadius: BorderRadius.circular(50.0),
-                                ),
-                                prefixIcon: const Icon(Icons.password_outlined),
-                                suffixIcon: IconButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      _obscurePassword2 = !_obscurePassword2;
-                                    });
-                                  },
-                                  icon: _obscurePassword2
-                                      ? const Icon(Icons.visibility_off_outlined)
-                                      : const Icon(Icons.visibility_outlined),
-                                ),
-                                hintText: "Enter New RePassword",
-                              ),
-                              controller: parentRePasswordController,
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(10.0),
-                            child: SizedBox(
-                              width: double.infinity,
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  // Call the updateProfile method here
-                                  updateParentProfile();
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.amberAccent,
-                                  side: BorderSide.none,
-                                  shape: const StadiumBorder(),
-                                ),
-                                child: Text(
-                                  "Save Profile",
-                                  style: TextStyle(color: Colors.teal),
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 10.0),
-                        ],
-                      );
-                    }
-                  }),
-            )));
+                          onPressed: () {
+                            setState(() {
+                              _obscurePassword2 = !_obscurePassword2;
+                            });
+                          },
+                        ),
+                      ),
+                      controller: parentRePasswordController,
+                    ),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          updateParentProfile();
+                        },
+                        style: ElevatedButton.styleFrom(
+                          primary: Colors.purple[200],
+                        ),
+                        child: Text(
+                          'Save Profile',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              }
+            },
+          ),
+        ),
+      ),
+    );
   }
 }

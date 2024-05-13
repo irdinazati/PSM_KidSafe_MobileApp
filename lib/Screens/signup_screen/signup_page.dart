@@ -28,7 +28,8 @@ class _SignupPageState extends State<SignupPage> {
   final TextEditingController _parentRePassEditingController =
   TextEditingController();
 
-  File? _image;
+  File? _imageFile;
+  final imagePicker = ImagePicker();
 
   Future<void> _pickImage() async {
     final ImagePicker _picker = ImagePicker();
@@ -37,11 +38,26 @@ class _SignupPageState extends State<SignupPage> {
 
     setState(() {
       if (pickedImage != null) {
-        _image = File(pickedImage.path);
+        _imageFile = File(pickedImage.path);
       } else {
         print('No image selected.');
       }
     });
+  }
+
+  Future<String?> _uploadImage() async {
+    if (_imageFile != null) {
+      String fileName = DateTime.now().millisecondsSinceEpoch.toString();
+      Reference reference =
+      FirebaseStorage.instance.ref().child('profile_images/$fileName.jpg');
+
+      UploadTask uploadTask = reference.putFile(_imageFile!);
+      TaskSnapshot storageTaskSnapshot = await uploadTask;
+
+      String downloadURL = await storageTaskSnapshot.ref.getDownloadURL();
+      return downloadURL;
+    }
+    return null;
   }
 
   Future<void> _registerUser() async {
@@ -71,8 +87,8 @@ class _SignupPageState extends State<SignupPage> {
 
       // Add parent data to Firestore
       String imageUrl = '';
-      if (_image != null) {
-        imageUrl = await uploadImage(_image!);
+      if (_imageFile != null) {
+        imageUrl = await _uploadImage() ?? '';
       }
 
       await FirebaseFirestore.instance
@@ -106,29 +122,13 @@ class _SignupPageState extends State<SignupPage> {
     }
   }
 
-  Future<String> uploadImage(File imageFile) async {
-    try {
-      // Upload image to Firebase Storage
-      String fileName = DateTime.now().millisecondsSinceEpoch.toString();
-      final Reference ref = FirebaseStorage.instance.ref().child(fileName);
-      await ref.putFile(imageFile);
-
-      // Get the image URL
-      return await ref.getDownloadURL();
-    } catch (e) {
-      // Handle upload errors
-      print('Error uploading image: $e');
-      return '';
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.purple[50], // Set the background color
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.purple[50],
         leading: IconButton(
           onPressed: () {
             Navigator.pop(context);
@@ -149,11 +149,18 @@ class _SignupPageState extends State<SignupPage> {
             children: <Widget>[
               Column(
                 children: <Widget>[
+                  Image.asset(
+                    'assets/signup.png', // Add your image asset here
+                    height: 250, // Increase the height of the image
+                    width: 250, // Increase the width of the image
+                  ),
+                  SizedBox(height: 20),
                   Text(
                     "Sign up",
                     style: TextStyle(
                       fontSize: 30,
                       fontWeight: FontWeight.bold,
+                      color: Colors.purple[200],
                     ),
                   ),
                   SizedBox(height: 20),
@@ -164,46 +171,61 @@ class _SignupPageState extends State<SignupPage> {
                       color: Colors.grey[700],
                     ),
                   ),
-                ],
-              ),
-              Column(
-                children: <Widget>[
-                  makeInput(
-                      label: "Parent Name",
-                      controller: _parentNameEditingController),
-                  makeInput(
-                      label: "Parent Full Name",
-                      controller: _parentFullNameEditingController),
-                  makeInput(
-                      label: "Parent Email",
-                      controller: _parentEmailEditingController),
-                  makeInput(
-                      label: "Parent Phone",
-                      controller: _parentPhoneEditingController),
-                  makeInput(
-                      label: "Parent Password",
-                      obscureText: true,
-                      controller: _parentPasswordEditingController),
-                  makeInput(
-                      label: "Confirm Parent Password",
-                      obscureText: true,
-                      controller: _parentRePassEditingController),
-                  SizedBox(height: 20),
-                  TextButton.icon(
-                    onPressed: _pickImage,
-                    icon: Icon(Icons.add_a_photo),
-                    label: Text('Add Profile Picture'),
+                  SizedBox(height: 20), // Add SizedBox for spacing
+                  GestureDetector(
+                    onTap: _pickImage,
+                    child: CircleAvatar(
+                      radius: 50,
+                      backgroundColor: Colors.purple[200],
+                      child: _imageFile != null
+                          ? ClipOval(
+                        child: Image.file(
+                          _imageFile!,
+                          width: 100,
+                          height: 100,
+                          fit: BoxFit.cover,
+                        ),
+                      )
+                          : Icon(
+                        Icons.add_a_photo,
+                        color: Colors.white,
+                        size: 40,
+                      ),
+                    ),
                   ),
-                  _image != null
-                      ? Image.file(
-                    _image!,
-                    height: 100,
-                    width: 100,
-                    fit: BoxFit.cover,
-                  )
-                      : SizedBox(),
+
+                  SizedBox(height: 20), // Add SizedBox for spacing
                 ],
               ),
+              makeInput(
+                label: "Parent Name",
+                controller: _parentNameEditingController,
+              ),
+              makeInput(
+                label: "Parent Full Name",
+                controller: _parentFullNameEditingController,
+              ),
+              makeInput(
+                label: "Parent Email",
+                controller: _parentEmailEditingController,
+              ),
+              makeInput(
+                label: "Parent Phone",
+                controller: _parentPhoneEditingController,
+              ),
+              makeInput(
+                label: "Parent Password",
+                obscureText: true,
+                controller: _parentPasswordEditingController,
+                isPassword: true,
+              ),
+              makeInput(
+                label: "Confirm Parent Password",
+                obscureText: true,
+                controller: _parentRePassEditingController,
+                isPassword: true,
+              ),
+              SizedBox(height: 20),
               Container(
                 padding: EdgeInsets.only(top: 3, left: 3),
                 decoration: BoxDecoration(
@@ -229,6 +251,7 @@ class _SignupPageState extends State<SignupPage> {
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
                       fontSize: 18,
+                      color: Colors.white,
                     ),
                   ),
                 ),
@@ -250,7 +273,7 @@ class _SignupPageState extends State<SignupPage> {
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
                         fontSize: 18,
-                        color: Colors.black, // Optional: Change color for emphasis
+                        color: Colors.purple[200],
                       ),
                     ),
                   ),
@@ -263,10 +286,12 @@ class _SignupPageState extends State<SignupPage> {
     );
   }
 
-  Widget makeInput(
-      {label,
-        obscureText = false,
-        required TextEditingController controller}) {
+  Widget makeInput({
+    label,
+    obscureText = false,
+    required TextEditingController controller,
+    bool isPassword = false,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -282,8 +307,20 @@ class _SignupPageState extends State<SignupPage> {
         TextField(
           obscureText: obscureText,
           controller: controller,
+          // Add password length validation
+          onChanged: (value) {
+            if (isPassword && value.length < 6) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text("Password must be at least 6 characters"),
+                  duration: Duration(seconds: 2),
+                ),
+              );
+            }
+          },
           decoration: InputDecoration(
-            contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 10),
+            contentPadding:
+            EdgeInsets.symmetric(vertical: 0, horizontal: 10),
             enabledBorder: OutlineInputBorder(
               borderSide: BorderSide(color: Colors.grey.shade400),
             ),
@@ -292,7 +329,7 @@ class _SignupPageState extends State<SignupPage> {
             ),
           ),
         ),
-        SizedBox(height: 30),
+        SizedBox(height: 20), // Reduced height to make it more compact
       ],
     );
   }

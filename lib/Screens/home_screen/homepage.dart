@@ -1,13 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fyp3/Screens/child_screen/child_profile.dart';
+import '../child_screen/child_homepage.dart';
 import '../educational_resources_screen/educational_resources_page.dart';
 import '../feedback_screen/feedback_page.dart';
 import '../incident_history_screen/incident_history_page.dart';
 import '../profile_screen/profile_page.dart';
 import '../settings_screen/settings_page.dart';
 import '../vehicle_monitoring_screen/vehicle_monitoring_page.dart';
-
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -17,6 +17,40 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  int _selectedIndex = 0;
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+      switch (index) {
+        case 0:
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => HomePage()),
+          );
+          break;
+        case 1:
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => ProfilePage(currentUserId: '')),
+          );
+          break;
+        case 2:
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => ChildInfoPage()),
+          );
+          break;
+        case 3:
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => SettingPage(currentUserId: '')),
+          );
+          break;
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -34,8 +68,7 @@ class _HomePageState extends State<HomePage> {
               children: [
                 const SizedBox(height: 50),
                 ListTile(
-                  contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 30),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 30),
                   title: Text('Hello!',
                       style: Theme.of(context)
                           .textTheme
@@ -51,9 +84,11 @@ class _HomePageState extends State<HomePage> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 30),
               decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(200))),
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(200),
+                ),
+              ),
               child: GridView.count(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
@@ -62,19 +97,17 @@ class _HomePageState extends State<HomePage> {
                 mainAxisSpacing: 30,
                 children: [
                   itemDashboard('Profile', CupertinoIcons.person_crop_circle,
-                      Colors.orange, ProfilePage()),
+                      Colors.orange, ProfilePage(currentUserId: '')),
                   itemDashboard('Child Profile', CupertinoIcons.person_crop_circle,
                       Colors.grey, ChildInfoPage()),
                   itemDashboard('Vehicle Monitoring', CupertinoIcons.car,
-                      Colors.green, VehicleMonitoringPage(sensorName: '',)),
+                      Colors.green, VehicleMonitoringPage(sensorName: '')),
                   itemDashboard('Educational Resources', CupertinoIcons.book,
                       Colors.brown, EducationalResourcesPage()),
                   itemDashboard('Feedback', CupertinoIcons.pencil,
-                      Colors.yellow, FeedbackPage(currentUserId: '',)),
+                      Colors.yellow, FeedbackPage(currentUserId: '')),
                   itemDashboard('Incident History', CupertinoIcons.time,
                       Colors.pink, IncidentHistoryPage()),
-                  itemDashboard('Settings', CupertinoIcons.settings,
-                      Colors.blue, SettingPage(currentUserId: '',)),
                 ],
               ),
             ),
@@ -82,7 +115,35 @@ class _HomePageState extends State<HomePage> {
           const SizedBox(height: 20)
         ],
       ),
+      bottomNavigationBar: BottomAppBar(
+        color: Colors.purple[200], // Set background color to purple[200]
+        child: BottomNavigationBar(
+          items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home),
+              label: 'Home',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.notifications),
+              label: 'Notifications',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.child_care_rounded),
+              label: 'Add Child',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.settings),
+              label: 'Settings',
+            ),
+          ],
+          currentIndex: _selectedIndex,
+          selectedItemColor: Colors.white,
+          onTap: _onItemTapped,
+        ),
+      ),
     );
+
+
   }
 
   Widget itemDashboard(
