@@ -3,9 +3,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class UpdateChildProfile extends StatefulWidget {
-  final String childId;
-
-  const UpdateChildProfile({required this.childId});
+  final String? childId;
+  final String currentUserId;
+  const UpdateChildProfile({required this.childId, required this.currentUserId});
 
   @override
   _UpdateChildProfileState createState() => _UpdateChildProfileState();
@@ -31,25 +31,26 @@ class _UpdateChildProfileState extends State<UpdateChildProfile> {
   void _loadChildInfo() async {
     try {
       String parentId = _auth.currentUser?.uid ?? '';
-      DocumentSnapshot<Map<String, dynamic>> documentSnapshot = await _firestore
+      QuerySnapshot<Map<String, dynamic>> querySnapshot = await _firestore
           .collection('parents')
           .doc(parentId)
           .collection('children')
-          .doc(widget.childId)
           .get();
 
-      if (documentSnapshot.exists) {
+      if (querySnapshot.docs.isNotEmpty) {
+        DocumentSnapshot<Map<String, dynamic>> childSnapshot = querySnapshot.docs.first;
         setState(() {
-          fullNameController.text = documentSnapshot['childFullName'];
-          nicknameController.text = documentSnapshot['childNickname'];
-          ageController.text = documentSnapshot['childAge'];
-          genderController.text = documentSnapshot['childGender'];
+          fullNameController.text = childSnapshot['childFullName'];
+          nicknameController.text = childSnapshot['childNickname'];
+          ageController.text = childSnapshot['childAge'];
+          genderController.text = childSnapshot['childGender'];
         });
       }
     } catch (error) {
       print('Error loading child info: $error');
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -58,26 +59,15 @@ class _UpdateChildProfileState extends State<UpdateChildProfile> {
       appBar: AppBar(
         backgroundColor: Colors.purple[100],
         title: Text("Update Child Profile"),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: Colors.black),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
       ),
       body: SingleChildScrollView(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              height: 200,
-              width: double.infinity,
-              child: Image.asset(
-                'assets/child3.png', // Replace 'your_image.jpg' with your image path
-                fit: BoxFit.cover,
-              ),
+            Image.asset(
+              'assets/child3.png', // Replace this with your image path
+              height: 150, // Adjust the height as needed
+              width: double.infinity, // Take up the entire width
             ),
-            SizedBox(height: 20), // Added SizedBox for spacing
             Container(
               padding: const EdgeInsets.all(20.0),
               child: Form(
@@ -99,12 +89,9 @@ class _UpdateChildProfileState extends State<UpdateChildProfile> {
                         style: ElevatedButton.styleFrom(
                           primary: Colors.purple[200],
                           padding: EdgeInsets.symmetric(vertical: 12, horizontal: 32),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
                         ),
                         child: Text(
-                          "Update",
+                          "Save",
                           style: TextStyle(fontSize: 16, color: Colors.white),
                         ),
                       ),
@@ -119,7 +106,8 @@ class _UpdateChildProfileState extends State<UpdateChildProfile> {
     );
   }
 
-  Widget _buildFormField(String label, TextEditingController controller, String? validationMessage,
+  Widget _buildFormField(String label, TextEditingController controller,
+      String? validationMessage,
       {TextInputType? keyboardType, bool isReadOnly = false}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -132,18 +120,9 @@ class _UpdateChildProfileState extends State<UpdateChildProfile> {
           filled: true,
           fillColor: Colors.white,
         ),
-        validator: (value) {
-          if (validationMessage != null && (value == null || value.isEmpty)) {
-            return validationMessage;
-          }
-          return null;
-        },
-        keyboardType: keyboardType,
         readOnly: isReadOnly,
         onTap: () {
           if (label == 'Gender') {
-            // Show gender selection dropdown
-            FocusScope.of(context).requestFocus(FocusNode());
             _showGenderSelectionDialog(controller);
           }
         },
@@ -151,7 +130,6 @@ class _UpdateChildProfileState extends State<UpdateChildProfile> {
     );
   }
 
-  // Method to show gender selection dialog
   void _showGenderSelectionDialog(TextEditingController controller) {
     showDialog(
       context: context,
@@ -164,25 +142,25 @@ class _UpdateChildProfileState extends State<UpdateChildProfile> {
               InkWell(
                 onTap: () {
                   setState(() {
-                    controller.text = 'Female'; // Update gender to Female
+                    controller.text = 'Girl'; // Update gender to Female
                   });
                   Navigator.pop(context);
                 },
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Text('Female'),
+                  child: Text('Girl'),
                 ),
               ),
               InkWell(
                 onTap: () {
                   setState(() {
-                    controller.text = 'Male'; // Update gender to Male
+                    controller.text = 'Boy'; // Update gender to Male
                   });
                   Navigator.pop(context);
                 },
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Text('Male'),
+                  child: Text('Boy'),
                 ),
               ),
             ],
@@ -204,6 +182,11 @@ class _UpdateChildProfileState extends State<UpdateChildProfile> {
       String gender = genderController.text;
 
       String parentId = _auth.currentUser?.uid ?? '';
+
+      // Debug statements
+      print('Child ID: ${widget.childId}');
+      print('Parent ID: $parentId');
+
 
       await _firestore
           .collection('parents')
@@ -229,7 +212,8 @@ class _UpdateChildProfileState extends State<UpdateChildProfile> {
         ),
       );
 
-      Navigator.pop(context); // Close the page after updating
+      // Navigate back to previous screen after updating
+      Navigator.pop(context);
     } catch (error) {
       print('Error updating child profile: $error');
       ScaffoldMessenger.of(context).showSnackBar(

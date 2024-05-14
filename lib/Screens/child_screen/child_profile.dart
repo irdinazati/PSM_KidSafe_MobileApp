@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fyp3/Screens/child_screen/update_child_profile.dart';
-
+import '../../Models/child.dart';
 import '../home_screen/homepage.dart';
 import '../profile_screen/profile_page.dart';
 import '../settings_screen/settings_page.dart';
-import 'child_homepage.dart'; // Import the edit profile screen
+import 'child_homepage.dart';
 
 class DisplayChildProfile extends StatefulWidget {
   @override
@@ -17,11 +17,7 @@ class _DisplayChildProfileState extends State<DisplayChildProfile> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   int _selectedIndex = 0;
-
-  final TextEditingController fullNameController = TextEditingController();
-  final TextEditingController nicknameController = TextEditingController();
-  final TextEditingController ageController = TextEditingController();
-  final TextEditingController genderController = TextEditingController();
+  List<ChildModel> _children = [];
 
   @override
   void initState() {
@@ -29,7 +25,7 @@ class _DisplayChildProfileState extends State<DisplayChildProfile> {
     _loadChildInfo();
   }
 
-  void _loadChildInfo() async {
+  Future<void> _loadChildInfo() async {
     try {
       String parentId = _auth.currentUser?.uid ?? '';
       QuerySnapshot<Map<String, dynamic>> querySnapshot = await _firestore
@@ -39,12 +35,12 @@ class _DisplayChildProfileState extends State<DisplayChildProfile> {
           .get();
 
       if (querySnapshot.docs.isNotEmpty) {
-        DocumentSnapshot<Map<String, dynamic>> childSnapshot = querySnapshot.docs.first;
+        List<ChildModel> children = querySnapshot.docs.map((doc) {
+          return ChildModel.fromDoc(doc); // Use the factory constructor
+        }).toList();
+
         setState(() {
-          fullNameController.text = childSnapshot['childFullName'];
-          nicknameController.text = childSnapshot['childNickname'];
-          ageController.text = childSnapshot['childAge'];
-          genderController.text = childSnapshot['childGender'];
+          _children = children;
         });
       }
     } catch (error) {
@@ -58,59 +54,18 @@ class _DisplayChildProfileState extends State<DisplayChildProfile> {
       backgroundColor: Colors.purple[50],
       appBar: AppBar(
         backgroundColor: Colors.purple[100],
-        title: Text("Child Profile"),
+        title: Text("Child Profiles"),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            // Image widget added here
-            Image.asset(
-              'assets/child2.png', // Replace this with your image path
-              height: 300, // Adjust the height as needed
-              width: double.infinity, // Take up the entire width
-            ),
-            SizedBox(height: 20), // Added SizedBox for spacing
-            Container(
-              padding: const EdgeInsets.all(20.0),
-              decoration: BoxDecoration(
-                color: Colors.purple[100],
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildDisplayField('Full Name', fullNameController.text),
-                  _buildDisplayField('Nickname', nicknameController.text),
-                  _buildDisplayField('Age', ageController.text),
-                  _buildDisplayField('Gender', genderController.text),
-                ],
-              ),
-            ),
-            SizedBox(height: 20), // Added SizedBox for spacing
-            Center(
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => UpdateChildProfile(childId: ''),
-                    ),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  primary: Colors.purple[200],
-                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 32),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                ),
-                child: Text(
-                  'Edit Profile',
-                  style: TextStyle(color: Colors.white),
-                ),
-              ),
-            ),
-          ],
+      body: RefreshIndicator(
+        onRefresh: _loadChildInfo,
+        child: _children.isEmpty
+            ? Center(child: Text('No children found'))
+            : ListView.builder(
+          itemCount: _children.length,
+          itemBuilder: (context, index) {
+            final child = _children[index];
+            return _buildChildProfile(child);
+          },
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -135,6 +90,56 @@ class _DisplayChildProfileState extends State<DisplayChildProfile> {
         currentIndex: _selectedIndex,
         selectedItemColor: Colors.purple,
         onTap: _onItemTapped,
+      ),
+    );
+  }
+
+  Widget _buildChildProfile(ChildModel child) {
+    return Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.purple[200],
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildDisplayField('Full Name', child.childFullName),
+            _buildDisplayField('Nickname', child.childName),
+            _buildDisplayField('Age', child.childAge.toString()),
+            _buildDisplayField('Gender', child.childGender),
+            SizedBox(height: 20),
+            Center(
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => UpdateChildProfile(
+                        childId: child.id!, // Pass the childId here
+                        currentUserId: _auth.currentUser?.uid ?? '', // Pass the currentUserId here
+                      ),
+                    ),
+                  ).then((_) {
+                    _loadChildInfo(); // Refresh the child info after returning from the update screen
+                  });
+                },
+                style: ElevatedButton.styleFrom(
+                  primary: Colors.purple[400],
+                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 32),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+                child: Text(
+                  'Edit Profile',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

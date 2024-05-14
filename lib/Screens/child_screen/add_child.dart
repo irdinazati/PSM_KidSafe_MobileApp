@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fyp3/Screens/child_screen/update_child_profile.dart';
+
+import '../home_screen/homepage.dart';
+import '../profile_screen/edit_profile_page.dart';
+import '../profile_screen/profile_page.dart';
+import '../settings_screen/settings_page.dart';
+import 'child_homepage.dart';
 
 class AddChildProfile extends StatefulWidget {
   @override
@@ -44,11 +51,13 @@ class _AddChildProfileState extends State<AddChildProfile> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildFormField('Full Name', fullNameController, 'Please enter full name'),
+                    _buildFormField(
+                        'Full Name', fullNameController, 'Please enter full name'),
                     SizedBox(height: 16),
                     _buildFormField('Nickname', nicknameController, null),
                     SizedBox(height: 16),
-                    _buildFormField('Age', ageController, null, keyboardType: TextInputType.number),
+                    _buildFormField('Age', ageController, null,
+                        keyboardType: TextInputType.number),
                     SizedBox(height: 16),
                     _buildFormField('Gender', genderController, null),
                     SizedBox(height: 20),
@@ -60,11 +69,13 @@ class _AddChildProfileState extends State<AddChildProfile> {
                           padding: EdgeInsets.symmetric(vertical: 12, horizontal: 32),
                         ),
                         child: Text(
-                          "Save",
+                          "Add Child",
                           style: TextStyle(fontSize: 16, color: Colors.white),
                         ),
                       ),
                     ),
+                    SizedBox(height: 20),
+                    // Add the button for editing profile
                   ],
                 ),
               ),
@@ -139,7 +150,7 @@ class _AddChildProfileState extends State<AddChildProfile> {
                 controller.text = newValue!;
               });
             },
-            items: ['Female', 'Male'].map<DropdownMenuItem<String>>((String value) {
+            items: ['Girl', 'Boy'].map<DropdownMenuItem<String>>((String value) {
               return DropdownMenuItem<String>(
                 value: value,
                 child: Text(value),
@@ -198,6 +209,12 @@ class _AddChildProfileState extends State<AddChildProfile> {
     );
   }
 
+  Future<String> _fetchChildId() async {
+    // Implement the logic to fetch the child ID here
+    // For now, return an empty string
+    return '';
+  }
+
   Future<void> _createChildProfile() async {
     if (!_formKey.currentState!.validate()) {
       return;
@@ -211,7 +228,8 @@ class _AddChildProfileState extends State<AddChildProfile> {
 
       String parentId = _auth.currentUser?.uid ?? '';
 
-      await _firestore
+      // Add the child profile document to Firestore
+      DocumentReference childRef = await _firestore
           .collection('parents')
           .doc(parentId)
           .collection('children')
@@ -222,9 +240,14 @@ class _AddChildProfileState extends State<AddChildProfile> {
         'childGender': gender,
       });
 
+      // Get the ID of the newly added child
+      String childId = childRef.id;
+      print('childIDD = $childId');
+
       await _firestore.collection('system_log').add({
         'userId': parentId,
         'action': 'Child Profile Created',
+        'childId': childId, // Include childId in system log
         'timestamp': FieldValue.serverTimestamp(),
       });
 
@@ -234,7 +257,10 @@ class _AddChildProfileState extends State<AddChildProfile> {
         ),
       );
 
-      Navigator.pop(context); // Close the page after saving
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => ChildInfoPage()), // Pass childId here
+      );
     } catch (error) {
       print('Error creating child profile: $error');
       ScaffoldMessenger.of(context).showSnackBar(
@@ -248,21 +274,32 @@ class _AddChildProfileState extends State<AddChildProfile> {
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
+      switch (index) {
+        case 0:
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => HomePage()),
+          );
+          break;
+        case 1:
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => ProfilePage(currentUserId: '')),
+          );
+          break;
+        case 2:
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => ChildInfoPage()), // Pass childId here
+          );
+          break;
+        case 3:
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => SettingPage(currentUserId: '')),
+          );
+          break;
+      }
     });
-    // Handle navigation logic here
-    switch (index) {
-      case 0:
-      // Navigate to home screen
-        break;
-      case 1:
-      // Navigate to notifications screen
-        break;
-      case 2:
-      // Navigate to add child screen (this screen)
-        break;
-      case 3:
-      // Navigate to settings screen
-        break;
-    }
   }
 }

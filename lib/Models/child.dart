@@ -4,10 +4,8 @@ class ChildModel {
   String? id;
   final String childName;
   final String childGender;
-  final int childAge;
-  final DateTime childDOB;
-
-  var childFullName;
+  final int? childAge;
+  final String childFullName;
 
   ChildModel({
     this.id,
@@ -15,7 +13,6 @@ class ChildModel {
     required this.childFullName,
     required this.childGender,
     required this.childAge,
-    required this.childDOB,
   });
 
   Map<String, dynamic> toJson() {
@@ -25,20 +22,27 @@ class ChildModel {
       'childFullName': childFullName,
       'childGender': childGender,
       'childAge': childAge,
-      'childDOB': childDOB,
     };
   }
 
   factory ChildModel.fromDoc(DocumentSnapshot doc) {
     Map<String, dynamic>? data = doc.data() as Map<String, dynamic>?;
 
+    int? age;
+    if (data?['childAge'] != null) {
+      if (data!['childAge'] is String) {
+        age = int.tryParse(data['childAge']);
+      } else if (data['childAge'] is int) {
+        age = data['childAge'];
+      }
+    }
+
     return ChildModel(
-      id: doc.id,
-      childName: data?['childName'] ?? '',
+      id: doc.id, // Use doc.id to get the document ID
+      childName: data?['childNickname'] ?? '',
       childFullName: data?['childFullName'] ?? '',
       childGender: data?['childGender'] ?? '',
-      childAge: data?['childAge'] ?? 0, // Assuming default age as 0 if not provided
-      childDOB: (data?['childDOB'] as Timestamp?)?.toDate() ?? DateTime.now(), // Convert Timestamp to DateTime
+      childAge: age ?? 0, // Assuming default age as 0 if not provided or conversion fails
     );
   }
 }

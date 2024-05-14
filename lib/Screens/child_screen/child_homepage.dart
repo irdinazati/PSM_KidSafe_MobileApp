@@ -145,7 +145,7 @@ class _ChildInfoPageState extends State<ChildInfoPage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => UpdateChildProfile(childId: ''),
+                    builder: (context) => UpdateChildProfile(childId: '', currentUserId: '',),
                   ),
                 );
               },
