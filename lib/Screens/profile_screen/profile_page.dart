@@ -64,16 +64,27 @@ class _ProfilePageState extends State<ProfilePage> {
               onPressed: () {
                 Navigator.of(context).pop(); // Close the dialog
               },
-              child: Text('Cancel'),
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                  color: Colors.purple[200], // Set text color to purple
+                ),
+              ),
             ),
             TextButton(
               onPressed: () async {
                 await _logout(); // Call the logout function if confirmed
                 Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(builder: (context) => LoginPage()));
+                    MaterialPageRoute(builder: (context) => LoginPage())
+                );
                 // Close the dialog
               },
-              child: Text('Logout'),
+              child: Text(
+                'Logout',
+                style: TextStyle(
+                  color: Colors.purple[200], // Set text color to purple
+                ),
+              ),
             ),
           ],
         );

@@ -137,19 +137,6 @@ class _ChildInfoPageState extends State<ChildInfoPage> {
               indent: 15,
               endIndent: 15,
             ),
-            SizedBox(height: 20),
-            ProfileMenuWidget(
-              title: "Update Child Profile",
-              icon: Icons.edit,
-              onPress: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => UpdateChildProfile(childId: '', currentUserId: '',),
-                  ),
-                );
-              },
-            ),
           ],
         ),
       ),

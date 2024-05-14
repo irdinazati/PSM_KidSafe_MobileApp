@@ -1,15 +1,10 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:fyp3/Screens/educational_resources_screen/video_page.dart';
+import 'package:fyp3/Screens/home_screen/homepage.dart';
 import 'package:http/http.dart' as http;
 
-class SearchResult {
-  final String title;
-  final String snippet;
-  final String videoId; // Include video ID in SearchResult
-
-  SearchResult({required this.title, required this.snippet, required this.videoId});
-}
+import '../../Models/search_result.dart';
 
 class EducationalResourcesPage extends StatefulWidget {
   const EducationalResourcesPage({Key? key}) : super(key: key);
@@ -84,6 +79,15 @@ class _EducationalResourcesPageState extends State<EducationalResourcesPage> {
           style: TextStyle(color: Colors.white),
         ),
         backgroundColor: Colors.purple[200],
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => HomePage()), // Pass childId here
+            );
+          },
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

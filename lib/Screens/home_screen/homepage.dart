@@ -106,7 +106,7 @@ class _HomePageState extends State<HomePage> {
                       Colors.brown, EducationalResourcesPage()),
                   itemDashboard('Feedback', CupertinoIcons.pencil,
                       Colors.yellow, FeedbackPage(currentUserId: '')),
-                  itemDashboard('Incident History', CupertinoIcons.time,
+                  itemDashboard('History Log', CupertinoIcons.time,
                       Colors.pink, IncidentHistoryPage()),
                 ],
               ),
@@ -116,8 +116,8 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       bottomNavigationBar: BottomAppBar(
-        color: Colors.purple[200], // Set background color to purple[200]
         child: BottomNavigationBar(
+          backgroundColor: Colors.purple, // Set background color to purple
           items: const <BottomNavigationBarItem>[
             BottomNavigationBarItem(
               icon: Icon(Icons.home),
@@ -137,13 +137,11 @@ class _HomePageState extends State<HomePage> {
             ),
           ],
           currentIndex: _selectedIndex,
-          selectedItemColor: Colors.white,
+          selectedItemColor: Colors.purple,
           onTap: _onItemTapped,
         ),
       ),
     );
-
-
   }
 
   Widget itemDashboard(

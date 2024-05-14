@@ -36,7 +36,7 @@ class _DisplayChildProfileState extends State<DisplayChildProfile> {
 
       if (querySnapshot.docs.isNotEmpty) {
         List<ChildModel> children = querySnapshot.docs.map((doc) {
-          return ChildModel.fromDoc(doc); // Use the factory constructor
+          return ChildModel.fromDoc(doc);
         }).toList();
 
         setState(() {
@@ -54,7 +54,7 @@ class _DisplayChildProfileState extends State<DisplayChildProfile> {
       backgroundColor: Colors.purple[50],
       appBar: AppBar(
         backgroundColor: Colors.purple[100],
-        title: Text("Child Profiles"),
+        title: Text("Child Profile"),
       ),
       body: RefreshIndicator(
         onRefresh: _loadChildInfo,
@@ -98,9 +98,18 @@ class _DisplayChildProfileState extends State<DisplayChildProfile> {
     return Padding(
       padding: const EdgeInsets.all(20.0),
       child: Container(
+        padding: const EdgeInsets.all(20.0),
         decoration: BoxDecoration(
-          color: Colors.purple[200],
+          color: Colors.white,
           borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.3),
+              spreadRadius: 3,
+              blurRadius: 5,
+              offset: Offset(0, 3),
+            ),
+          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -117,12 +126,12 @@ class _DisplayChildProfileState extends State<DisplayChildProfile> {
                     context,
                     MaterialPageRoute(
                       builder: (context) => UpdateChildProfile(
-                        childId: child.id!, // Pass the childId here
-                        currentUserId: _auth.currentUser?.uid ?? '', // Pass the currentUserId here
+                        childId: child.id!,
+                        currentUserId: _auth.currentUser?.uid ?? '',
                       ),
                     ),
                   ).then((_) {
-                    _loadChildInfo(); // Refresh the child info after returning from the update screen
+                    _loadChildInfo();
                   });
                 },
                 style: ElevatedButton.styleFrom(
@@ -145,19 +154,31 @@ class _DisplayChildProfileState extends State<DisplayChildProfile> {
   }
 
   Widget _buildDisplayField(String label, String value) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          "$label: $value",
-          style: TextStyle(
-            fontSize: 16,
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 5.0),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              "$label: ",
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.purple[900],
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
-        ),
-        SizedBox(height: 10),
-      ],
+          Expanded(
+            child: Text(
+              value,
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.black87,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
