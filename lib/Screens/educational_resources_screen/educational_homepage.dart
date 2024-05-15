@@ -3,7 +3,15 @@ import 'package:fyp3/Screens/educational_resources_screen/parenting_page.dart';
 
 import 'educational_resources_page.dart';
 
-class EducationalHomePage extends StatelessWidget {
+class EducationalHomePage extends StatefulWidget {
+  const EducationalHomePage({Key? key}) : super(key: key);
+
+  @override
+  State<EducationalHomePage> createState() => _EducationalHomePageState();
+}
+
+class _EducationalHomePageState extends State<EducationalHomePage> {
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -138,8 +146,3 @@ class EducationalHomePage extends StatelessWidget {
   }
 }
 
-void main() {
-  runApp(MaterialApp(
-    home: EducationalHomePage(),
-  ));
-}

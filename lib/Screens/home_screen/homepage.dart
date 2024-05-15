@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fyp3/Screens/child_screen/child_profile.dart';
 import '../child_screen/child_homepage.dart';
+import '../educational_resources_screen/educational_homepage.dart';
 import '../educational_resources_screen/educational_resources_page.dart';
 import '../feedback_screen/feedback_page.dart';
 import '../incident_history_screen/incident_history_page.dart';
@@ -103,7 +104,7 @@ class _HomePageState extends State<HomePage> {
                   itemDashboard('Vehicle Monitoring', CupertinoIcons.car,
                       Colors.green, VehicleMonitoringPage(sensorName: '')),
                   itemDashboard('Educational Resources', CupertinoIcons.book,
-                      Colors.brown, EducationalResourcesPage()),
+                      Colors.brown, EducationalHomePage()),
                   itemDashboard('Feedback', CupertinoIcons.pencil,
                       Colors.yellow, FeedbackPage(currentUserId: '')),
                   itemDashboard('History Log', CupertinoIcons.time,

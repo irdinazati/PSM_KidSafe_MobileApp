@@ -1,9 +1,12 @@
 import 'dart:io';
+import 'package:animate_do/animate_do.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:crypto/crypto.dart';
+import 'dart:convert';
 
 import '../login_screen/login_page.dart';
 
@@ -15,26 +18,18 @@ class SignupPage extends StatefulWidget {
 }
 
 class _SignupPageState extends State<SignupPage> {
-  final TextEditingController _parentNameEditingController =
-  TextEditingController();
-  final TextEditingController _parentFullNameEditingController =
-  TextEditingController();
-  final TextEditingController _parentEmailEditingController =
-  TextEditingController();
-  final TextEditingController _parentPhoneEditingController =
-  TextEditingController();
-  final TextEditingController _parentPasswordEditingController =
-  TextEditingController();
-  final TextEditingController _parentRePassEditingController =
-  TextEditingController();
+  final TextEditingController _parentNameEditingController = TextEditingController();
+  final TextEditingController _parentFullNameEditingController = TextEditingController();
+  final TextEditingController _parentEmailEditingController = TextEditingController();
+  final TextEditingController _parentPhoneEditingController = TextEditingController();
+  final TextEditingController _parentPasswordEditingController = TextEditingController();
+  final TextEditingController _parentRePassEditingController = TextEditingController();
 
   File? _imageFile;
-  final imagePicker = ImagePicker();
+  final ImagePicker _picker = ImagePicker();
 
   Future<void> _pickImage() async {
-    final ImagePicker _picker = ImagePicker();
-    final XFile? pickedImage =
-    await _picker.pickImage(source: ImageSource.gallery);
+    final XFile? pickedImage = await _picker.pickImage(source: ImageSource.gallery);
 
     setState(() {
       if (pickedImage != null) {
@@ -48,8 +43,7 @@ class _SignupPageState extends State<SignupPage> {
   Future<String?> _uploadImage() async {
     if (_imageFile != null) {
       String fileName = DateTime.now().millisecondsSinceEpoch.toString();
-      Reference reference =
-      FirebaseStorage.instance.ref().child('profile_images/$fileName.jpg');
+      Reference reference = FirebaseStorage.instance.ref().child('profile_images/$fileName.jpg');
 
       UploadTask uploadTask = reference.putFile(_imageFile!);
       TaskSnapshot storageTaskSnapshot = await uploadTask;
@@ -58,6 +52,12 @@ class _SignupPageState extends State<SignupPage> {
       return downloadURL;
     }
     return null;
+  }
+
+  String hashPassword(String password) {
+    var bytes = utf8.encode(password); // Convert password to bytes
+    var digest = sha256.convert(bytes); // Hash the bytes using SHA-256
+    return digest.toString(); // Convert the hash to a string
   }
 
   Future<void> _registerUser() async {
@@ -71,18 +71,24 @@ class _SignupPageState extends State<SignupPage> {
       String pRole = "parent";
       String pStatus = "Active";
 
-      UserCredential userCredential = await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(
-          email: _parentEmailEditingController.text.trim(),
-          password: _parentPasswordEditingController.text.trim());
+      if (pPassword != pRePassword) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Passwords do not match")));
+        return;
+      }
+
+      if (pPassword.length < 6) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Password must be at least 6 characters")));
+        return;
+      }
+
+      UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: pEmail,
+        password: pPassword,
+      );
 
       // Add user data to Firestore
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userCredential.user!.uid)
-          .set({
-        'email': _parentEmailEditingController.text.trim(),
-        // Add additional fields as needed
+      await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).set({
+        'email': pEmail,
       });
 
       // Add parent data to Firestore
@@ -91,16 +97,12 @@ class _SignupPageState extends State<SignupPage> {
         imageUrl = await _uploadImage() ?? '';
       }
 
-      await FirebaseFirestore.instance
-          .collection('parents')
-          .doc(userCredential.user!.uid)
-          .set({
+      await FirebaseFirestore.instance.collection('parents').doc(userCredential.user!.uid).set({
         'parentName': pName,
         'parentFullName': pFullName,
         'parentEmail': pEmail,
         'parentPhoneNumber': pPhone,
-        'parentPassword': pPassword,
-        'parentRePassword': pRePassword,
+        'parentPassword': hashPassword(pPassword), // Store the hashed password
         'role': pRole,
         'status': pStatus,
         'profilePicture': imageUrl, // Add image URL to Firestore
@@ -113,12 +115,12 @@ class _SignupPageState extends State<SignupPage> {
       );
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
-        print('The password provided is too weak.');
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('The password provided is too weak.')));
       } else if (e.code == 'email-already-in-use') {
-        print('The account already exists for that email.');
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('The account already exists for that email.')));
       }
     } catch (e) {
-      print(e);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
     }
   }
 
@@ -149,10 +151,13 @@ class _SignupPageState extends State<SignupPage> {
             children: <Widget>[
               Column(
                 children: <Widget>[
-                  Image.asset(
-                    'assets/signup.png', // Add your image asset here
-                    height: 250, // Increase the height of the image
-                    width: 250, // Increase the width of the image
+                  FadeInUp(
+                    duration: Duration(milliseconds: 1000),
+                    child: Image.asset(
+                      'assets/signup.png',
+                      height: MediaQuery.of(context).size.height / 4,
+                      fit: BoxFit.cover,
+                    ),
                   ),
                   SizedBox(height: 20),
                   Text(
@@ -193,7 +198,6 @@ class _SignupPageState extends State<SignupPage> {
                       ),
                     ),
                   ),
-
                   SizedBox(height: 20), // Add SizedBox for spacing
                 ],
               ),
@@ -287,8 +291,8 @@ class _SignupPageState extends State<SignupPage> {
   }
 
   Widget makeInput({
-    label,
-    obscureText = false,
+    required String label,
+    bool obscureText = false,
     required TextEditingController controller,
     bool isPassword = false,
   }) {
@@ -307,20 +311,8 @@ class _SignupPageState extends State<SignupPage> {
         TextField(
           obscureText: obscureText,
           controller: controller,
-          // Add password length validation
-          onChanged: (value) {
-            if (isPassword && value.length < 6) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text("Password must be at least 6 characters"),
-                  duration: Duration(seconds: 2),
-                ),
-              );
-            }
-          },
           decoration: InputDecoration(
-            contentPadding:
-            EdgeInsets.symmetric(vertical: 0, horizontal: 10),
+            contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 10),
             enabledBorder: OutlineInputBorder(
               borderSide: BorderSide(color: Colors.grey.shade400),
             ),

@@ -2,7 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:fyp3/Screens/educational_resources_screen/educational_homepage.dart';
 import 'educational_resources_page.dart';
 
-class ParentingPage extends StatelessWidget {
+class ParentingPage extends StatefulWidget {
+  const ParentingPage({Key? key}) : super(key: key);
+
+  @override
+  State<ParentingPage> createState() => _ParentingPageState();
+}
+
+class _ParentingPageState extends State<ParentingPage> {
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -106,8 +114,3 @@ class ParentingPage extends StatelessWidget {
   }
 }
 
-void main() {
-  runApp(MaterialApp(
-    home: ParentingPage(),
-  ));
-}
