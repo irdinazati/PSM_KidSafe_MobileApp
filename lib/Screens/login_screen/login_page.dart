@@ -1,26 +1,36 @@
+import 'package:art_sweetalert/art_sweetalert.dart';
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fyp3/Screens/home_screen/homepage.dart';
 import 'package:fyp3/Screens/login_screen/forgot_password_page.dart';
-import '../signup_screen/signup_page.dart';
+import 'package:fyp3/Screens/signup_screen/signup_page.dart';
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
+  @override
+  _LoginPageState createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  String? uid = FirebaseAuth.instance.currentUser?.uid;
-
+  String googleEmail = "";
 
   Future<void> signIn(BuildContext context) async {
     try {
-      UserCredential userCredential = await FirebaseAuth.instance
-          .signInWithEmailAndPassword(
+      UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: emailController.text, password: passwordController.text);
+
+      // Successfully logged in, fetch the current user's UID
+      String? uid = FirebaseAuth.instance.currentUser?.uid;
+
       // Successfully logged in, navigate to home screen
       print('userid=${uid}');
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => HomePage(currentUserId: uid,)),
+        MaterialPageRoute(builder: (context) => HomePage(currentUserId: uid)),
       );
     } on FirebaseAuthException catch (e) {
       // Handle login errors
@@ -32,6 +42,62 @@ class LoginPage extends StatelessWidget {
       // Display error to user
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text('Failed to sign in: ${e.message}')));
+    }
+  }
+
+  Future<void> _handleGoogleSignIn() async {
+    final GoogleSignIn googleSignIn = GoogleSignIn();
+    try {
+      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+      if (googleUser == null) {
+        return; // The user canceled the sign-in
+      }
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final AuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      final UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
+      final User? user = userCredential.user;
+
+      setState(() {
+        googleEmail = user?.email ?? '';
+        emailController.text = googleEmail;
+      });
+
+      // Successful login
+      final String? uid = user?.uid;
+
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString("loggedUserId", uid!);
+      await prefs.setString("usertype", "Parent");
+
+      ArtSweetAlert.show(
+        barrierDismissible: false,
+        context: context,
+        artDialogArgs: ArtDialogArgs(
+          type: ArtSweetAlertType.success,
+          title: "LOGIN SUCCESSFUL",
+          text: "You may proceed to go to home page!",
+          onConfirm: () async {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => HomePage(currentUserId: uid)),
+            );
+          },
+        ),
+      );
+    } catch (error) {
+      print(error);
+      ArtSweetAlert.show(
+        context: context,
+        artDialogArgs: ArtDialogArgs(
+          type: ArtSweetAlertType.danger,
+          title: "LOGIN FAIL",
+          text: error.toString(),
+        ),
+      );
     }
   }
 
@@ -106,7 +172,8 @@ class LoginPage extends StatelessWidget {
                         signIn(context);
                       },
                       style: ElevatedButton.styleFrom(
-                        minimumSize: Size(double.infinity, 50), backgroundColor: Colors.purple.shade200,
+                        minimumSize: Size(double.infinity, 50),
+                        backgroundColor: Colors.purple.shade200,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30),
                         ),
@@ -120,17 +187,17 @@ class LoginPage extends StatelessWidget {
                       ),
                     ),
                   ),
-
                   SizedBox(height: 20),
                   // "Sign in with Google" button
                   FadeInUp(
                     duration: Duration(milliseconds: 1500),
                     child: ElevatedButton(
                       onPressed: () {
-                        // Add functionality to handle Google sign-in when this button is clicked
+                        _handleGoogleSignIn();
                       },
                       style: ElevatedButton.styleFrom(
-                        minimumSize: Size(double.infinity, 50), backgroundColor: Colors.white,
+                        minimumSize: Size(double.infinity, 50),
+                        backgroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30),
                           side: BorderSide(color: Colors.grey.shade400),
@@ -245,9 +312,7 @@ class LoginPage extends StatelessWidget {
               ),
             ),
             border: OutlineInputBorder(
-              borderSide: BorderSide(
-                color: Colors.grey.shade400,
-              ),
+              borderSide: BorderSide(color: Colors.grey.shade400),
             ),
           ),
         ),

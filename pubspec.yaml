@@ -49,6 +49,8 @@ dependencies:
   uuid: ^4.2.1
   image_picker: ^1.0.5
   google_sign_in: ^6.1.6
+  shared_preferences: ^2.0.6
+  art_sweetalert: ^0.0.5
 
 dev_dependencies:
   flutter_test:

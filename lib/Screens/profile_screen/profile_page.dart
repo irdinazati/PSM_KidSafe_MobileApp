@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fyp3/Screens/login_screen/login_page.dart';
 import 'package:get/get.dart';
+import '../Google Login.dart';
 
 import '../../widget/profile_menu.dart';
 import '../child_screen/child_homepage.dart';
@@ -62,6 +63,7 @@ class _ProfilePageState extends State<ProfilePage> {
           actions: <Widget>[
             TextButton(
               onPressed: () {
+
                 Navigator.of(context).pop(); // Close the dialog
               },
               child: Text(
@@ -96,6 +98,7 @@ class _ProfilePageState extends State<ProfilePage> {
   Future<void> _logout() async {
     try {
       await FirebaseAuth.instance.signOut();
+      await GoogleLogin.logout();
       // Redirect to the login page after logout
       Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (context) => LoginPage()));

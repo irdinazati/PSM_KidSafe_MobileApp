@@ -18,6 +18,12 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: OnBoardingScreen(),
+      theme: ThemeData(
+        // Customize the bottom navigation bar theme
+        bottomNavigationBarTheme: BottomNavigationBarThemeData(
+          backgroundColor: Colors.blue
+        ),
+      ),
     );
   }
 }

@@ -118,32 +118,31 @@ class _HomePageState extends State<HomePage> {
           const SizedBox(height: 20)
         ],
       ),
-      bottomNavigationBar: BottomAppBar(
-        child: BottomNavigationBar(
-          backgroundColor: Colors.purple, // Set background color to purple
-          items: const <BottomNavigationBarItem>[
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: 'Home',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.notifications),
-              label: 'Notifications',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.child_care_rounded),
-              label: 'Add Child',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.settings),
-              label: 'Settings',
-            ),
-          ],
-          currentIndex: _selectedIndex,
-          selectedItemColor: Colors.purple,
-          unselectedItemColor: Colors.black,
-          onTap: _onItemTapped,
-        ),
+
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Colors.purple, // Set background color to purple
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.notifications),
+            label: 'Notifications',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.child_care_rounded),
+            label: 'Add Child',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            label: 'Settings',
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        selectedItemColor: Colors.purple,
+        unselectedItemColor: Colors.black,
+        onTap: _onItemTapped,
       ),
     );
   }
