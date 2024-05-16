@@ -11,7 +11,9 @@ import '../settings_screen/settings_page.dart';
 import '../vehicle_monitoring_screen/vehicle_monitoring_page.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+  final String? currentUserId;
+
+  const HomePage({Key? key, this.currentUserId}) : super(key: key);
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -106,7 +108,7 @@ class _HomePageState extends State<HomePage> {
                   itemDashboard('Educational Resources', CupertinoIcons.book,
                       Colors.brown, EducationalHomePage()),
                   itemDashboard('Feedback', CupertinoIcons.pencil,
-                      Colors.yellow, FeedbackPage(currentUserId: '')),
+                      Colors.yellow, FeedbackPage(currentUserId: widget.currentUserId)),
                   itemDashboard('History Log', CupertinoIcons.time,
                       Colors.pink, IncidentHistoryPage()),
                 ],
@@ -139,6 +141,7 @@ class _HomePageState extends State<HomePage> {
           ],
           currentIndex: _selectedIndex,
           selectedItemColor: Colors.purple,
+          unselectedItemColor: Colors.black,
           onTap: _onItemTapped,
         ),
       ),

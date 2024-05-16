@@ -8,6 +8,8 @@ import '../signup_screen/signup_page.dart';
 class LoginPage extends StatelessWidget {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  String? uid = FirebaseAuth.instance.currentUser?.uid;
+
 
   Future<void> signIn(BuildContext context) async {
     try {
@@ -15,9 +17,10 @@ class LoginPage extends StatelessWidget {
           .signInWithEmailAndPassword(
           email: emailController.text, password: passwordController.text);
       // Successfully logged in, navigate to home screen
+      print('userid=${uid}');
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => HomePage()),
+        MaterialPageRoute(builder: (context) => HomePage(currentUserId: uid,)),
       );
     } on FirebaseAuthException catch (e) {
       // Handle login errors

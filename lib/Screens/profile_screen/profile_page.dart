@@ -156,8 +156,6 @@ class _ProfilePageState extends State<ProfilePage> {
               } else {
                 String parentFullName = snapshot.data?['parentFullName'] ?? '';
                 String parentName = snapshot.data?['parentName'] ?? '';
-                String parentEmail = snapshot.data?['parentEmail'] ?? '';
-                String parentPassword = snapshot.data?['parentPassword'] ?? '';
                 String parentPhoneNumber =
                     snapshot.data?['parentPhoneNumber'] ?? '';
                 return Column(
@@ -196,22 +194,6 @@ class _ProfilePageState extends State<ProfilePage> {
                           SizedBox(height: 10),
                           Text(
                             "Name: $parentName",
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.white,
-                            ),
-                          ),
-                          SizedBox(height: 10),
-                          Text(
-                            "Email: $parentEmail",
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.white,
-                            ),
-                          ),
-                          SizedBox(height: 10),
-                          Text(
-                            "Password: $parentPassword",
                             style: TextStyle(
                               fontSize: 16,
                               color: Colors.white,
