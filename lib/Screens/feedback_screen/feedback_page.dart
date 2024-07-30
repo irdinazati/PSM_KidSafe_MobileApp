@@ -1,6 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:fyp3/Screens/home_screen/homepage.dart';
+import 'package:fyp3/Screens/vehicle_monitoring_screen/vehicle_monitoring_page.dart';
+
+import '../profile_screen/profile_page.dart';
+import '../settings_screen/settings_page.dart';
 
 class FeedbackPage extends StatefulWidget {
   final String? currentUserId;
@@ -14,6 +19,37 @@ class FeedbackPage extends StatefulWidget {
 class _FeedbackPageState extends State<FeedbackPage> {
   double _rating = 0;
   String _comment = '';
+
+  void _onItemTapped(int index) {
+    setState(() {
+      switch (index) {
+        case 0:
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => HomePage()),
+          );
+          break;
+        case 1:
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => ProfilePage(currentUserId: '')),
+          );
+          break;
+        case 2:
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => VehicleMonitoringPage(sensorName: '',)),
+          );
+          break;
+        case 3:
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => SettingPage(currentUserId: '')),
+          );
+          break;
+      }
+    });
+  }
 
   Future<void> _submitFeedback() async {
     try {
@@ -48,7 +84,16 @@ class _FeedbackPageState extends State<FeedbackPage> {
             color: Colors.white,
           ),
         ),
-        backgroundColor: Colors.purple[200],
+        backgroundColor: Colors.purple[100],
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => HomePage()), // Pass childId here
+            );
+          },
+        ),
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16.0),
@@ -116,6 +161,26 @@ class _FeedbackPageState extends State<FeedbackPage> {
             ),
           ],
         ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Colors.purple[200], // Set background color to purple
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Profile',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.car_crash_outlined),
+            label: 'Vehicle Monitoring',
+          ),
+        ],
+        selectedItemColor: Colors.white, // Set selected item color to white for better contrast
+        onTap: _onItemTapped,
+        type: BottomNavigationBarType.fixed, // Ensure the type is fixed to display all items equally
       ),
     );
   }

@@ -131,7 +131,7 @@ class _ReactivateScreenState extends State<ReactivateScreen> {
                       onPressed: () async {
                         print('Debug: Before calling reactivateAccount. ID: ${widget.currentUserId}');
                         DatabaseServices databaseServices = DatabaseServices();
-                        await databaseServices.reactivateAccount(widget.currentUserId);
+                        //await databaseServices.reactivateAccount(widget.currentUserId);
                         print('Debug: After calling reactivateAccount.');
                         // Show AlertDialog here
                         showDialog(

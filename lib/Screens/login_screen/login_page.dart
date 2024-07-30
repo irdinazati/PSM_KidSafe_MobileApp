@@ -1,12 +1,16 @@
 import 'package:art_sweetalert/art_sweetalert.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fyp3/Models/parent.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fyp3/Screens/home_screen/homepage.dart';
 import 'package:fyp3/Screens/login_screen/forgot_password_page.dart';
 import 'package:fyp3/Screens/signup_screen/signup_page.dart';
+
+import '../../Models/feedback.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -18,32 +22,98 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController passwordController = TextEditingController();
   String googleEmail = "";
 
-  Future<void> signIn(BuildContext context) async {
-    try {
-      UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
-          email: emailController.text, password: passwordController.text);
+  @override
+  void initState() {
+    super.initState();
+  }
 
-      // Successfully logged in, fetch the current user's UID
-      String? uid = FirebaseAuth.instance.currentUser?.uid;
 
-      // Successfully logged in, navigate to home screen
+  
+    Future<DocumentSnapshot> getUserDoc(String? userId) async {
+    // Retrieve the user document from Firestore
+    return await FirebaseFirestore.instance
+        .collection('parents')
+        .doc(userId)
+        .get();
+  }
+
+  void _showDeactivatedAccountDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Account Deactivated'),
+          content: const Text(
+              'This account is no longer active. Please sign up'),
+          actions: [
+            TextButton(
+              child: const Text('No'),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+            TextButton(
+              child: const Text('Yes'),
+              onPressed: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => SignupPage(),
+                  ),
+                );
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+
+
+ Future<void> signIn(BuildContext context) async {
+  try {
+    UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: emailController.text, password: passwordController.text);
+
+    // Successfully logged in, fetch the current user's UID
+    String? uid = FirebaseAuth.instance.currentUser?.uid;
+
+    // Get the user's status from Firestore using ParentModel.fromDoc
+    ParentModel userModel = ParentModel.fromDoc(await getUserDoc(uid)); 
+
+    if (userModel.status == "Active") {
       print('userid=${uid}');
+      // If status is "Active", proceed to the home screen
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => HomePage(currentUserId: uid)),
       );
-    } on FirebaseAuthException catch (e) {
-      // Handle login errors
-      if (e.code == 'user-not-found') {
-        print('No user found for that email.');
-      } else if (e.code == 'wrong-password') {
-        print('Wrong password provided for that user.');
-      }
-      // Display error to user
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Failed to sign in: ${e.message}')));
+    } else {
+      // If status is not "Active", show a dialog indicating that the account is inactive
+      _showDeactivatedAccountDialog(context);
+      // Sign out the user since the account is inactive
+      await FirebaseAuth.instance.signOut();
     }
+  } on FirebaseAuthException catch (e) {
+    // Handle login errors
+    if (e.code == 'user-not-found') {
+      print('No user found for that email.');
+    } else if (e.code == 'wrong-password') {
+      print('Wrong password provided for that user.');
+    }
+    // Display error to user
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text('Failed to sign in: ${e.message}')));
   }
+}
+
+ Future<List<FeedbackModel>> fetchFeedback() async {
+  QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('feedback').get();
+  return querySnapshot.docs.map((doc) {
+    return FeedbackModel.fromMap(doc.data() as Map<String, dynamic>, doc.id);
+  }).toList();
+}
 
   Future<void> _handleGoogleSignIn() async {
     final GoogleSignIn googleSignIn = GoogleSignIn();

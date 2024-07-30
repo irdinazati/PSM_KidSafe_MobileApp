@@ -2,9 +2,12 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:fyp3/Screens/educational_resources_screen/video_page.dart';
 import 'package:fyp3/Screens/home_screen/homepage.dart';
+import 'package:fyp3/Screens/vehicle_monitoring_screen/vehicle_monitoring_page.dart';
 import 'package:http/http.dart' as http;
-
 import '../../Models/search_result.dart';
+import '../profile_screen/profile_page.dart';
+import '../settings_screen/settings_page.dart';
+import 'educational_homepage.dart';
 
 class EducationalResourcesPage extends StatefulWidget {
   const EducationalResourcesPage({Key? key}) : super(key: key);
@@ -70,21 +73,52 @@ class _EducationalResourcesPageState extends State<EducationalResourcesPage> {
     Navigator.push(context, MaterialPageRoute(builder: (context) => VideoPage(videoId: videoId)));
   }
 
+  void _onItemTapped(int index) {
+    setState(() {
+      switch (index) {
+        case 0:
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => HomePage()),
+          );
+          break;
+        case 1:
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => ProfilePage(currentUserId: '')),
+          );
+          break;
+        case 2:
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => VehicleMonitoringPage(sensorName: '',)),
+          );
+          break;
+        case 3:
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => SettingPage(currentUserId: '')),
+          );
+          break;
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Educational Resources',
+          'Resources from Youtube',
           style: TextStyle(color: Colors.white),
         ),
-        backgroundColor: Colors.purple[200],
+        backgroundColor: Colors.purple[100],
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => HomePage()), // Pass childId here
+              MaterialPageRoute(builder: (context) => EducationalHomePage()), // Pass childId here
             );
           },
         ),
@@ -141,6 +175,27 @@ class _EducationalResourcesPageState extends State<EducationalResourcesPage> {
             ),
           ],
         ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Colors.purple[200], // Set background color to purple
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Profile',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.car_crash_outlined),
+            label: 'Vehicle Monitoring',
+          ),
+        ],
+        selectedItemColor: Colors.white, // Set selected item color to white for better contrast
+        unselectedItemColor: Colors.black,
+        onTap: _onItemTapped,
+        type: BottomNavigationBarType.fixed, // Ensure the type is fixed to display all items equally
       ),
     );
   }

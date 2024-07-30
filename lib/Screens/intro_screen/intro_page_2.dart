@@ -21,7 +21,7 @@ class IntroPage2 extends StatelessWidget {
             SizedBox(height: 20),
             // Displaying the text
             Text(
-              'Check the back seat for your child!',
+              'Check the back seat of car!',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,

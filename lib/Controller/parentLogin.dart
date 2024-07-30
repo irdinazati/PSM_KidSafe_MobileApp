@@ -5,12 +5,6 @@ import 'package:fyp3/Screens/home_screen/homepage.dart';
 import '../Models/parent.dart';
 import '../Screens/signup_screen/reactivateAccount.dart';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
-import 'package:fyp3/Screens/home_screen/homepage.dart';
-import '../Models/parent.dart';
-import '../Screens/signup_screen/reactivateAccount.dart';
 
 class ParentLoginController {
   final FirebaseAuth _auth = FirebaseAuth.instance;

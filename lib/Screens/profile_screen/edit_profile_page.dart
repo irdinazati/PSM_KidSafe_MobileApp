@@ -3,10 +3,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:fyp3/Screens/home_screen/homepage.dart';
+import 'package:fyp3/Screens/profile_screen/profile_page.dart';
+import 'package:fyp3/Screens/vehicle_monitoring_screen/vehicle_monitoring_page.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../Controller/parentRegistration.dart';
+import '../settings_screen/settings_page.dart';
 
 class ParentEditProfile extends StatefulWidget {
   final String currentUserId;
@@ -136,6 +139,36 @@ class _ParentEditProfileState extends State<ParentEditProfile> {
     }
   }
 
+ void _onItemTapped(int index) {
+    setState(() {
+      switch (index) {
+        case 0:
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => HomePage()),
+          );
+          break;
+        case 1:
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => ProfilePage(currentUserId: '')),
+          );
+          break;
+        case 2:
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => VehicleMonitoringPage(sensorName: '',)),
+          );
+          break;
+        case 3:
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => SettingPage(currentUserId: '')),
+          );
+          break;
+      }
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -149,6 +182,15 @@ class _ParentEditProfileState extends State<ParentEditProfile> {
             fontWeight: FontWeight.bold,
           ),
           textAlign: TextAlign.left, // Align text to the left
+        ),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => ProfilePage(currentUserId: '',)), // Pass childId here
+            );
+          },
         ),
       ),
       body: SingleChildScrollView(
@@ -297,6 +339,27 @@ class _ParentEditProfileState extends State<ParentEditProfile> {
             },
           ),
         ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Colors.purple[200], // Set background color to purple
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Profile',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.car_crash_outlined),
+            label: 'Vehicle Monitoring',
+          ),
+        ],
+        selectedItemColor: Colors.white, // Set selected item color to white for better contrast
+        unselectedItemColor: Colors.black,
+        onTap: _onItemTapped,
+        type: BottomNavigationBarType.fixed, // Ensure the type is fixed to display all items equally
       ),
     );
   }

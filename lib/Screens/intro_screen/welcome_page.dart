@@ -1,14 +1,71 @@
 import 'package:animate_do/animate_do.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-
+import '../feedback_screen/feedback_list.dart';
 import '../login_screen/login_page.dart';
 import '../signup_screen/signup_page.dart';
 
-class WelcomePage extends StatelessWidget {
+class FeedbackModel {
+  final String userId;
+  final int rating;
+  final String comment;
+  final Timestamp timestamp;
+
+  FeedbackModel({
+    required this.userId,
+    required this.rating,
+    required this.comment,
+    required this.timestamp,
+  });
+
+  factory FeedbackModel.fromMap(Map<String, dynamic> data) {
+    return FeedbackModel(
+      userId: data['userId'] ?? '',
+      rating: data['rating'] ?? 0,
+      comment: data['comment'] ?? '',
+      timestamp: data['timestamp'] ?? Timestamp.now(),
+    );
+  }
+
+  String getFormattedDate() {
+    DateTime date = timestamp.toDate();
+    return '${date.day}/${date.month}/${date.year} ${date.hour}:${date.minute}';
+  }
+}
+
+class WelcomePage extends StatefulWidget {
+
+  @override
+  _WelcomePageState createState() => _WelcomePageState();
+}
+
+class _WelcomePageState extends State<WelcomePage> {
+  List<FeedbackModel> feedbackList = [];
+
+  @override
+  void initState() {
+    super.initState();
+    loadFeedback();
+  }
+
+  Future<void> loadFeedback() async {
+    List<FeedbackModel> feedback = await fetchFeedback();
+    setState(() {
+      feedbackList = feedback;
+    });
+  }
+
+  Future<List<FeedbackModel>> fetchFeedback() async {
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('feedback').get();
+    return querySnapshot.docs.map((doc) {
+      return FeedbackModel.fromMap(doc.data() as Map<String, dynamic>);
+    }).toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.purple[50], // Set the background color
+      backgroundColor: Colors.purple[50],
       body: SafeArea(
         child: SingleChildScrollView(
           child: Container(
@@ -48,7 +105,7 @@ class WelcomePage extends StatelessWidget {
                     FadeInUp(
                       duration: Duration(milliseconds: 1400),
                       child: Image.asset(
-                        'assets/images/logo1.png', // Update asset path as needed
+                        'assets/images/logo1.png',
                       ),
                     ),
                   ],
@@ -84,12 +141,7 @@ class WelcomePage extends StatelessWidget {
                         padding: EdgeInsets.only(top: 3, left: 3),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(50),
-                          border: Border(
-                            bottom: BorderSide(color: Colors.black),
-                            top: BorderSide(color: Colors.black),
-                            left: BorderSide(color: Colors.black),
-                            right: BorderSide(color: Colors.black),
-                          ),
+                          border: Border.all(color: Colors.black),
                         ),
                         child: MaterialButton(
                           minWidth: double.infinity,
@@ -113,6 +165,31 @@ class WelcomePage extends StatelessWidget {
                         ),
                       ),
                     ),
+                    SizedBox(height: 20),
+                  FadeInUp(
+                    duration: Duration(milliseconds: 1500),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text("Click here to see the"),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(context, MaterialPageRoute(builder: (context) {
+                              return FeedbackListPage();
+                            }));
+                          },
+                          child: Text(
+                            ' Feedback',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                   ],
                 ),
               ],
@@ -123,3 +200,5 @@ class WelcomePage extends StatelessWidget {
     );
   }
 }
+
+

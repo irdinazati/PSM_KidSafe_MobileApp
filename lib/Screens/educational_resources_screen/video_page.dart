@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:fyp3/Screens/educational_resources_screen/educational_resources_page.dart';
+import 'package:fyp3/Screens/vehicle_monitoring_screen/vehicle_monitoring_page.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../home_screen/homepage.dart';
+import '../profile_screen/profile_page.dart';
+import '../settings_screen/settings_page.dart';
 
 class VideoPage extends StatefulWidget {
   final String videoId;
@@ -17,6 +22,37 @@ class _VideoPageState extends State<VideoPage> {
   late String _description;
   bool _loading = true;
   bool _error = false;
+
+  void _onItemTapped(int index) {
+    setState(() {
+      switch (index) {
+        case 0:
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => HomePage()),
+          );
+          break;
+        case 1:
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => ProfilePage(currentUserId: '')),
+          );
+          break;
+        case 2:
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => VehicleMonitoringPage(sensorName: '',)),
+          );
+          break;
+        case 3:
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => SettingPage(currentUserId: '')),
+          );
+          break;
+      }
+    });
+  }
 
   @override
   void initState() {
@@ -63,6 +99,15 @@ class _VideoPageState extends State<VideoPage> {
       appBar: AppBar(
         title: Text('Video Page'),
         backgroundColor: Colors.purple[200],
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => EducationalResourcesPage()),
+          );
+          },
+        ),
       ),
       body: _loading
           ? Center(child: CircularProgressIndicator())
@@ -117,6 +162,27 @@ class _VideoPageState extends State<VideoPage> {
             ),
           ),
         ],
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Colors.purple[200], // Set background color to purple
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Profile',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.car_crash_outlined),
+            label: 'Vehicle Monitoring',
+          ),
+        ],
+        selectedItemColor: Colors.white, // Set selected item color to white for better contrast
+        unselectedItemColor: Colors.black,
+        onTap: _onItemTapped,
+        type: BottomNavigationBarType.fixed, // Ensure the type is fixed to display all items equally
       ),
     );
   }

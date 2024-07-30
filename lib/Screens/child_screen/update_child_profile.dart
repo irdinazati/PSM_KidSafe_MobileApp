@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fyp3/Screens/child_screen/child_profile.dart';
+import 'package:fyp3/Screens/vehicle_monitoring_screen/vehicle_monitoring_page.dart';
+
+import '../home_screen/homepage.dart';
+import '../profile_screen/profile_page.dart';
+import '../settings_screen/settings_page.dart';
 
 class UpdateChildProfile extends StatefulWidget {
   final String? childId;
@@ -28,6 +34,37 @@ class _UpdateChildProfileState extends State<UpdateChildProfile> {
     _loadChildInfo();
   }
 
+void _onItemTapped(int index) {
+    setState(() {
+      switch (index) {
+        case 0:
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => HomePage()),
+          );
+          break;
+        case 1:
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => ProfilePage(currentUserId: '')),
+          );
+          break;
+        case 2:
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => VehicleMonitoringPage(sensorName: '',)),
+          );
+          break;
+        case 3:
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => SettingPage(currentUserId: '')),
+          );
+          break;
+      }
+    });
+  }
+  
   void _loadChildInfo() async {
     try {
       String parentId = _auth.currentUser?.uid ?? '';
@@ -59,6 +96,15 @@ class _UpdateChildProfileState extends State<UpdateChildProfile> {
       appBar: AppBar(
         backgroundColor: Colors.purple[100],
         title: Text("Update Child Profile"),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => DisplayChildProfile()), // Pass childId here
+            );
+          },
+        ),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -102,6 +148,27 @@ class _UpdateChildProfileState extends State<UpdateChildProfile> {
             ),
           ],
         ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Colors.purple[200], // Set background color to purple
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Profile',
+          ),
+           BottomNavigationBarItem(
+            icon: Icon(Icons.car_crash_outlined),
+            label: 'Vehicle Monitoring',
+          ),
+        ],
+        selectedItemColor: Colors.white, // Set selected item color to white for better contrast
+        unselectedItemColor: Colors.black,
+        onTap: _onItemTapped,
+        type: BottomNavigationBarType.fixed, // Ensure the type is fixed to display all items equally
       ),
     );
   }

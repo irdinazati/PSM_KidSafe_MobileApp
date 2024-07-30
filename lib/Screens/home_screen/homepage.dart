@@ -1,9 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:fyp3/Screens/child_screen/child_profile.dart';
+import 'package:fyp3/Screens/community_screen/community_page.dart';
 import '../child_screen/child_homepage.dart';
 import '../educational_resources_screen/educational_homepage.dart';
-import '../educational_resources_screen/educational_resources_page.dart';
 import '../feedback_screen/feedback_page.dart';
 import '../incident_history_screen/incident_history_page.dart';
 import '../profile_screen/profile_page.dart';
@@ -23,35 +22,36 @@ class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
 
   void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
+    if (index != _selectedIndex) {
+      setState(() {
+        _selectedIndex = index;
+      });
       switch (index) {
         case 0:
-          Navigator.push(
+          Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => HomePage()),
           );
           break;
         case 1:
-          Navigator.push(
+          Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => ProfilePage(currentUserId: '')),
+            MaterialPageRoute(
+                builder: (context) => ProfilePage(currentUserId: '')),
           );
           break;
         case 2:
-          Navigator.push(
+          Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => ChildInfoPage()),
+            MaterialPageRoute(
+                builder: (context) => VehicleMonitoringPage(
+                      sensorName: '',
+                    )),
           );
           break;
-        case 3:
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => SettingPage(currentUserId: '')),
-          );
-          break;
+        
       }
-    });
+    }
   }
 
   @override
@@ -72,11 +72,35 @@ class _HomePageState extends State<HomePage> {
                 const SizedBox(height: 50),
                 ListTile(
                   contentPadding: const EdgeInsets.symmetric(horizontal: 30),
-                  title: Text('Hello!',
-                      style: Theme.of(context)
-                          .textTheme
-                          .headline6
-                          ?.copyWith(color: Colors.white)),
+                  title: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        
+                        'Hello, Parent!',
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleLarge
+                            ?.copyWith(color: Colors.white),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    SettingPage(currentUserId: widget.currentUserId)),
+                          );
+                        },
+                        child: Row(
+                          children: [
+                            const SizedBox(width: 8),
+                            Icon(Icons.settings),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 30)
               ],
@@ -100,17 +124,28 @@ class _HomePageState extends State<HomePage> {
                 mainAxisSpacing: 30,
                 children: [
                   itemDashboard('Profile', CupertinoIcons.person_crop_circle,
-                      Colors.orange, ProfilePage(currentUserId: '')),
-                  itemDashboard('Child Profile', CupertinoIcons.person_crop_circle,
-                      Colors.grey, ChildInfoPage()),
-                  itemDashboard('Vehicle Monitoring', CupertinoIcons.car,
-                      Colors.green, VehicleMonitoringPage(sensorName: '')),
+                      Colors.orange, const ProfilePage(currentUserId: '')),
+                  itemDashboard(
+                      'Child Profile',
+                      CupertinoIcons.person_crop_circle,
+                      Colors.grey,
+                      ChildInfoPage(currentUserId: widget.currentUserId)),
+                  itemDashboard(
+                      'Vehicle Monitoring',
+                      CupertinoIcons.car,
+                      Colors.green,
+                      const VehicleMonitoringPage(sensorName: '')),
                   itemDashboard('Educational Resources', CupertinoIcons.book,
-                      Colors.brown, EducationalHomePage()),
-                  itemDashboard('Feedback', CupertinoIcons.pencil,
-                      Colors.yellow, FeedbackPage(currentUserId: widget.currentUserId)),
-                  itemDashboard('History Log', CupertinoIcons.time,
-                      Colors.pink, IncidentHistoryPage()),
+                      Colors.brown, const EducationalHomePage()),
+                  itemDashboard(
+                      'Feedback',
+                      CupertinoIcons.pencil,
+                      Colors.yellow,
+                      FeedbackPage(currentUserId: widget.currentUserId)),
+                  itemDashboard('History Log', CupertinoIcons.time, Colors.pink,
+                      IncidentHistoryPage()),
+                  itemDashboard('Community', CupertinoIcons.book,
+                      Colors.brown, CommunityScreen()),
                 ],
               ),
             ),
@@ -118,31 +153,28 @@ class _HomePageState extends State<HomePage> {
           const SizedBox(height: 20)
         ],
       ),
-
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.purple, // Set background color to purple
+        backgroundColor: Colors.purple[200], // Set background color to purple
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.notifications),
-            label: 'Notifications',
+            icon: Icon(Icons.person),
+            label: 'Profile',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.child_care_rounded),
-            label: 'Add Child',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
+            icon: Icon(Icons.car_crash_outlined),
+            label: 'Vehicle Monitoring',
           ),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: Colors.purple,
-        unselectedItemColor: Colors.black,
+        selectedItemColor: Colors
+            .white, // Set selected item color to white for better contrast
         onTap: _onItemTapped,
+        type: BottomNavigationBarType
+            .fixed, // Ensure the type is fixed to display all items equally
       ),
     );
   }

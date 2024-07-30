@@ -1,13 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
-import '../Constants/Constants.dart';
 import '../Models/parent.dart';
 
 
 class DatabaseServices {
-
-  final CollectionReference _feedCollection = FirebaseFirestore.instance.collection('feeds');
   final firestoreInstance = FirebaseFirestore.instance;
 
 
@@ -39,25 +34,15 @@ class DatabaseServices {
           .doc(userId)
           .get();
 
-      // Check if the user exists in the 'educators' collection
-      DocumentSnapshot educatorSnapshot = await FirebaseFirestore.instance
-          .collection('educators')
-          .doc(userId)
-          .get();
-
+      
       // Perform soft delete based on existence in either collection
       if (parentSnapshot.exists) {
         // User exists in the 'parents' collection, perform soft delete
         await FirebaseFirestore.instance
             .collection('parents')
             .doc(userId)
-            .update({'status': 'Deactivate'});
-      } else if (educatorSnapshot.exists) {
-        // User exists in the 'educators' collection, perform soft delete
-        await FirebaseFirestore.instance
-            .collection('educators')
-            .doc(userId)
-            .update({'status': 'Deactivate'});
+            .update({'status': 'Inactive'});
+      
       } else {
         // Handle the case where the user is not found in either collection
         print('User not found in both parents and educators collections');
@@ -67,52 +52,37 @@ class DatabaseServices {
     }
   }
 
-  Future<void> reactivateAccount(String? userId) async {
-    try {
-      // Check if the user exists in the 'parents' collection
-      DocumentSnapshot parentSnapshot = await FirebaseFirestore.instance
-          .collection('parents')
-          .doc(userId)
-          .get();
+  // Future<void> reactivateAccount(String? userId) async {
+  //   try {
+  //     // Check if the user exists in the 'parents' collection
+  //     DocumentSnapshot parentSnapshot = await FirebaseFirestore.instance
+  //         .collection('parents')
+  //         .doc(userId)
+  //         .get();
 
-      // Check if the user exists in the 'educators' collection
-      DocumentSnapshot educatorSnapshot = await FirebaseFirestore.instance
-          .collection('educators')
-          .doc(userId)
-          .get();
+     
+  //     print('User ID: $userId');
+  //     print('Parent Snapshot: ${parentSnapshot.exists}');
 
-      // Log user details
-      print('User ID: $userId');
-      print('Parent Snapshot: ${parentSnapshot.exists}');
-      print('Educator Snapshot: ${educatorSnapshot.exists}');
+  //     // Perform soft delete based on existence in either collection
+  //     if (parentSnapshot.exists) {
+  //       // User exists in the 'parents' collection, perform soft delete
+  //       await FirebaseFirestore.instance
+  //           .collection('parents')
+  //           .doc(userId)
+  //           .update({'status': 'Active'});
 
-      // Perform soft delete based on existence in either collection
-      if (parentSnapshot.exists) {
-        // User exists in the 'parents' collection, perform soft delete
-        await FirebaseFirestore.instance
-            .collection('parents')
-            .doc(userId)
-            .update({'status': 'Active'});
-
-        // Log success message
-        print('User status updated to Active in parents collection');
-      } else if (educatorSnapshot.exists) {
-        // User exists in the 'educators' collection, perform soft delete
-        await FirebaseFirestore.instance
-            .collection('educators')
-            .doc(userId)
-            .update({'status': 'Active'});
-
-        // Log success message
-        print('User status updated to Active in educators collection');
-      } else {
-        // Handle the case where the user is not found in either collection
-        print('User not found in both parents and educators collections');
-      }
-    } catch (e) {
-      // Log error message
-      print("Error reactivate account: $e");
-    }
-  }
+  //       // Log success message
+  //       print('User status updated to Active in parents collection');
+      
+  //     } else {
+  //       // Handle the case where the user is not found in either collection
+  //       print('User not found in both parents and educators collections');
+  //     }
+  //   } catch (e) {
+  //     // Log error message
+  //     print("Error reactivate account: $e");
+  //   }
+  // }
 
 }

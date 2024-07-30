@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fyp3/Screens/child_screen/update_child_profile.dart';
+import 'package:fyp3/Screens/vehicle_monitoring_screen/vehicle_monitoring_page.dart';
 import '../../Models/child.dart';
 import '../home_screen/homepage.dart';
 import '../profile_screen/profile_page.dart';
@@ -16,7 +17,7 @@ class DisplayChildProfile extends StatefulWidget {
 class _DisplayChildProfileState extends State<DisplayChildProfile> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  int _selectedIndex = 0;
+  int _selectedIndex = 5;
   List<ChildModel> _children = [];
 
   @override
@@ -55,6 +56,15 @@ class _DisplayChildProfileState extends State<DisplayChildProfile> {
       appBar: AppBar(
         backgroundColor: Colors.purple[100],
         title: Text("Child Profile"),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => ChildInfoPage()), // Pass childId here
+            );
+          },
+        ),
       ),
       body: RefreshIndicator(
         onRefresh: _loadChildInfo,
@@ -78,16 +88,12 @@ class _DisplayChildProfileState extends State<DisplayChildProfile> {
             icon: Icon(Icons.notifications),
             label: 'Notifications',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.child_care_rounded),
-            label: 'Add Child',
+           BottomNavigationBarItem(
+            icon: Icon(Icons.car_crash_outlined),
+            label: 'Vehicle Monitoring',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
-          ),
+
         ],
-        currentIndex: _selectedIndex,
         selectedItemColor: Colors.purple,
         onTap: _onItemTapped,
       ),
@@ -184,7 +190,6 @@ class _DisplayChildProfileState extends State<DisplayChildProfile> {
 
   void _onItemTapped(int index) {
     setState(() {
-      _selectedIndex = index;
       switch (index) {
         case 0:
           Navigator.push(
@@ -201,7 +206,7 @@ class _DisplayChildProfileState extends State<DisplayChildProfile> {
         case 2:
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => ChildInfoPage()),
+            MaterialPageRoute(builder: (context) => VehicleMonitoringPage(sensorName: '',)),
           );
           break;
         case 3:

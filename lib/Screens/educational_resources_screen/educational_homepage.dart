@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:fyp3/Screens/educational_resources_screen/parenting_page.dart';
-
+import 'package:fyp3/Screens/home_screen/homepage.dart';
+import 'package:fyp3/Screens/vehicle_monitoring_screen/vehicle_monitoring_page.dart';
+import '../profile_screen/profile_page.dart';
+import '../settings_screen/settings_page.dart';
 import 'educational_resources_page.dart';
 
 class EducationalHomePage extends StatefulWidget {
@@ -12,12 +15,51 @@ class EducationalHomePage extends StatefulWidget {
 
 class _EducationalHomePageState extends State<EducationalHomePage> {
 
+void _onItemTapped(int index) {
+    setState(() {
+      switch (index) {
+        case 0:
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => HomePage()),
+          );
+          break;
+        case 1:
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => ProfilePage(currentUserId: '')),
+          );
+          break;
+        case 2:
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => VehicleMonitoringPage(sensorName: '',)),
+          );
+          break;
+        case 3:
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => SettingPage(currentUserId: '')),
+          );
+          break;
+      }
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Educational Resources'),
-        backgroundColor: Colors.purple[200],
+        backgroundColor: Colors.purple[100],
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => HomePage()), // Pass childId here
+            );
+          },
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -66,7 +108,7 @@ class _EducationalHomePageState extends State<EducationalHomePage> {
                     ),
                   ),
                 ),
-                SizedBox(width: 16),
+                SizedBox(width: 30),
                 Expanded(
                   child: Container(
                     height: 160,
@@ -106,41 +148,76 @@ class _EducationalHomePageState extends State<EducationalHomePage> {
             ),
             SizedBox(height: 32),
             Text(
-              'Scrollable Images:',
+              'Parenting Tips:',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 16),
+            SizedBox(height: 20),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: [
-                  SizedBox(width: 16),
+                  SizedBox(width: 50),
                   Image.asset(
-                    'assets/child4.jpg',
-                    height: 200,
-                    width: 200,
+                    'assets/1.png',
+                    height: 250,
+                    width: 250,
                     fit: BoxFit.cover,
                   ),
-                  SizedBox(width: 16),
+                  SizedBox(width: 50),
                   Image.asset(
-                    'assets/child2.png',
-                    height: 200,
-                    width: 200,
+                    'assets/2.png',
+                    height: 250,
+                    width: 250,
                     fit: BoxFit.cover,
                   ),
-                  SizedBox(width: 16),
+                  SizedBox(width: 50),
                   Image.asset(
-                    'assets/child3.png',
-                    height: 200,
-                    width: 200,
+                    'assets/3.png',
+                    height: 250,
+                    width: 250,
                     fit: BoxFit.cover,
                   ),
-                  SizedBox(width: 16),
+                  SizedBox(width: 50),
+                  Image.asset(
+                    'assets/4.png',
+                    height: 250,
+                    width: 250,
+                    fit: BoxFit.cover,
+                  ),
+                  SizedBox(width: 50),
+                  Image.asset(
+                    'assets/5.png',
+                    height: 250,
+                    width: 250,
+                    fit: BoxFit.cover,
+                  ),
+                  SizedBox(width: 50),
                 ],
               ),
             ),
           ],
         ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Colors.purple[200], // Set background color to purple
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Profile',
+          ),
+           BottomNavigationBarItem(
+            icon: Icon(Icons.car_crash_outlined),
+            label: 'Vehicle Monitoring',
+          ),
+        ],
+        selectedItemColor: Colors.white, // Set selected item color to white for better contrast
+        unselectedItemColor: Colors.black,
+        onTap: _onItemTapped,
+        type: BottomNavigationBarType.fixed, // Ensure the type is fixed to display all items equally
       ),
     );
   }

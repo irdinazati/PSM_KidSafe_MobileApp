@@ -2,21 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fyp3/Screens/login_screen/login_page.dart';
-import 'package:get/get.dart';
+import 'package:fyp3/Screens/vehicle_monitoring_screen/vehicle_monitoring_page.dart';
 import '../Google Login.dart';
 
 import '../../widget/profile_menu.dart';
-import '../child_screen/child_homepage.dart';
-import '../child_screen/child_profile.dart';
 import '../home_screen/homepage.dart';
 import '../settings_screen/settings_page.dart';
-import '../settings_screen/system_info.dart';
 import 'edit_profile_page.dart';
 
 class ProfilePage extends StatefulWidget {
   final String currentUserId;
-
-  const ProfilePage({required this.currentUserId});
+  const ProfilePage({Key? key, required this.currentUserId}) : super(key: key);
 
   @override
   _ProfilePageState createState() => _ProfilePageState();
@@ -119,12 +115,15 @@ class _ProfilePageState extends State<ProfilePage> {
           );
           break;
         case 1:
-        // Do nothing, already on ProfilePage
+        Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => ProfilePage(currentUserId: '',)),
+          );
           break;
         case 2:
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => ChildInfoPage()),
+            MaterialPageRoute(builder: (context) => VehicleMonitoringPage(sensorName: '',)),
           );
           break;
         case 3:
@@ -145,6 +144,15 @@ class _ProfilePageState extends State<ProfilePage> {
         backgroundColor: Colors.purple[100],
         title: Text("Parent User Profile"),
         centerTitle: true,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => HomePage()), // Pass childId here
+            );
+          },
+        ),
       ),
       body: SingleChildScrollView(
         child: Container(
@@ -242,13 +250,13 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                     SizedBox(height: 20),
                     ProfileMenuWidget(
-                      title: "Child Information",
-                      icon: Icons.child_care,
+                      title: "Settings",
+                      icon: Icons.settings,
                       onPress: () {
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => ChildInfoPage(),
+                            builder: (context) => SettingPage(currentUserId: '',),
                           ),
                         );
                       },
@@ -265,7 +273,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     ProfileMenuWidget(
                       title: "Logout",
                       icon: Icons.logout,
-                      textColor: Colors.red,
+                      textColor: Colors.purple,
                       endIcon: false,
                       onPress: _showLogoutConfirmationDialog,
                     ),
@@ -277,6 +285,7 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Colors.purple[200], // Set background color to purple
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
@@ -287,17 +296,15 @@ class _ProfilePageState extends State<ProfilePage> {
             label: 'Profile',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.child_care_rounded),
-            label: 'Child',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
+            icon: Icon(Icons.car_crash_outlined),
+            label: 'Vehicle Monitoring',
           ),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: Colors.purple[800],
+        selectedItemColor: Colors.white, // Set selected item color to white for better contrast
+        unselectedItemColor: Colors.black,
         onTap: _onItemTapped,
+        type: BottomNavigationBarType.fixed, // Ensure the type is fixed to display all items equally
       ),
     );
   }

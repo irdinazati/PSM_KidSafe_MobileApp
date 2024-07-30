@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:fyp3/Screens/child_screen/update_child_profile.dart';
-
+import 'package:fyp3/Screens/vehicle_monitoring_screen/vehicle_monitoring_page.dart';
 import '../home_screen/homepage.dart';
-import '../profile_screen/edit_profile_page.dart';
 import '../profile_screen/profile_page.dart';
 import '../settings_screen/settings_page.dart';
 import 'child_homepage.dart';
@@ -25,8 +23,6 @@ class _AddChildProfileState extends State<AddChildProfile> {
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  int _selectedIndex = 0;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -34,6 +30,15 @@ class _AddChildProfileState extends State<AddChildProfile> {
       appBar: AppBar(
         backgroundColor: Colors.purple[100],
         title: Text("Add Child Profile"),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => ChildInfoPage()), // Pass childId here
+            );
+          },
+        ),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -83,28 +88,26 @@ class _AddChildProfileState extends State<AddChildProfile> {
           ],
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
+       bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Colors.purple[200], // Set background color to purple
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.notifications),
-            label: 'Notifications',
+            icon: Icon(Icons.person),
+            label: 'Profile',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.child_care_rounded),
-            label: 'Add Child',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
+           BottomNavigationBarItem(
+            icon: Icon(Icons.car_crash_outlined),
+            label: 'Vehicle Monitoring',
           ),
         ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: Colors.purple,
+        selectedItemColor: Colors.white, // Set selected item color to white for better contrast
+        unselectedItemColor: Colors.black,
         onTap: _onItemTapped,
+        type: BottomNavigationBarType.fixed, // Ensure the type is fixed to display all items equally
       ),
     );
   }
@@ -273,7 +276,6 @@ class _AddChildProfileState extends State<AddChildProfile> {
 
   void _onItemTapped(int index) {
     setState(() {
-      _selectedIndex = index;
       switch (index) {
         case 0:
           Navigator.push(
@@ -290,7 +292,7 @@ class _AddChildProfileState extends State<AddChildProfile> {
         case 2:
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => ChildInfoPage()), // Pass childId here
+            MaterialPageRoute(builder: (context) => VehicleMonitoringPage(sensorName: '',)),
           );
           break;
         case 3:
