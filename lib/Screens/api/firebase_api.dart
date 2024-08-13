@@ -37,9 +37,11 @@ class FirebaseApi {
 
     await _localNotifications.initialize(
       settings,
-      onSelectNotification: (payload) {
-        final message = RemoteMessage.fromMap(jsonDecode(payload!));
-        handleMessage(message);
+      onDidReceiveNotificationResponse: (NotificationResponse response) async {
+        if (response.payload != null) {
+          final message = RemoteMessage.fromMap(jsonDecode(response.payload!));
+          handleMessage(message);
+        }
       },
     );
 

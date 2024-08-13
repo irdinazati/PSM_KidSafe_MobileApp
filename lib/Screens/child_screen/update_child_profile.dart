@@ -133,7 +133,7 @@ void _onItemTapped(int index) {
                       child: ElevatedButton(
                         onPressed: _updateChildProfile,
                         style: ElevatedButton.styleFrom(
-                          primary: Colors.purple[200],
+                          backgroundColor: Colors.purple[200],
                           padding: EdgeInsets.symmetric(vertical: 12, horizontal: 32),
                         ),
                         child: Text(

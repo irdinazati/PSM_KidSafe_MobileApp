@@ -99,7 +99,7 @@ void _onItemTapped(int index) {
                         ],
                       ),
                       style: ElevatedButton.styleFrom(
-                        primary: Colors.purple[100],
+                        backgroundColor: Colors.purple[100],
                         elevation: 4,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
@@ -135,7 +135,7 @@ void _onItemTapped(int index) {
                         ],
                       ),
                       style: ElevatedButton.styleFrom(
-                        primary: Colors.purple[100],
+                        backgroundColor: Colors.purple[100],
                         elevation: 4,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),

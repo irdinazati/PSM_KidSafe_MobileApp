@@ -113,7 +113,7 @@ class _FeedbackListPageState extends State<FeedbackListPage> {
                 return ElevatedButton(
                   onPressed: () => _loadFeedback(ratingFilter: rating.toDouble()),
                   style: ElevatedButton.styleFrom(
-                    primary: selectedRatingFilter == rating
+                    backgroundColor: selectedRatingFilter == rating
                         ? Colors.purple.shade300
                         : Colors.purple.shade100,
                   ),

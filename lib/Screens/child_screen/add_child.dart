@@ -70,7 +70,7 @@ class _AddChildProfileState extends State<AddChildProfile> {
                       child: ElevatedButton(
                         onPressed: _createChildProfile,
                         style: ElevatedButton.styleFrom(
-                          primary: Colors.purple[200],
+                          backgroundColor: Colors.purple[200],
                           padding: EdgeInsets.symmetric(vertical: 12, horizontal: 32),
                         ),
                         child: Text(

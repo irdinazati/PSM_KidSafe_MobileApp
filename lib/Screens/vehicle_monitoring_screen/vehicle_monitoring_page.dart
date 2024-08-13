@@ -1,30 +1,33 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:fyp3/Screens/home_screen/homepage.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:syncfusion_flutter_gauges/gauges.dart';
+
+import '../home_screen/homepage.dart';
+import '../incident_history_screen/incident_history_page.dart';
 import '../profile_screen/profile_page.dart';
 import '../settings_screen/settings_page.dart';
 
 class VehicleMonitoringPage extends StatefulWidget {
   final String sensorName;
 
-  const VehicleMonitoringPage({Key? key, required this.sensorName}) : super(key: key);
+  const VehicleMonitoringPage({Key? key, required this.sensorName})
+      : super(key: key);
 
   @override
   _VehicleMonitoringPageState createState() => _VehicleMonitoringPageState();
 }
 
 class _VehicleMonitoringPageState extends State<VehicleMonitoringPage> {
-  String temperature = "Fetching Data..."; // Default sensor value
-  String motion = "Fetching Data..."; // Default sensor value
+  String temperature = "Fetching Data...";
+  String motion = "Fetching Data...";
   bool isLoading = true;
-  int _selectedIndex = 2; // Index for the BottomNavigationBar
+  int _selectedIndex = 2;
 
   @override
   void initState() {
     super.initState();
-    // Fetch sensor data initially
     fetchSensorData();
   }
 
@@ -34,7 +37,7 @@ class _VehicleMonitoringPageState extends State<VehicleMonitoringPage> {
     });
 
     final String url =
-        'https://api.thingspeak.com/channels/2554215/feeds.json?api_key=GQXZ7HQWUIPKL9I8&results=1'; // Adjust the URL as needed
+        'https://api.thingspeak.com/channels/2554215/feeds.json?api_key=GQXZ7HQWUIPKL9I8&results=1';
 
     try {
       final response = await http.get(Uri.parse(url));
@@ -56,7 +59,6 @@ class _VehicleMonitoringPageState extends State<VehicleMonitoringPage> {
           });
         }
       } else {
-        // Handle error
         setState(() {
           temperature = 'Error fetching data';
           motion = 'Error fetching data';
@@ -64,7 +66,6 @@ class _VehicleMonitoringPageState extends State<VehicleMonitoringPage> {
         });
       }
     } catch (e) {
-      // Handle error
       setState(() {
         temperature = 'Error: $e';
         motion = 'Error: $e';
@@ -79,27 +80,26 @@ class _VehicleMonitoringPageState extends State<VehicleMonitoringPage> {
       switch (index) {
         case 0:
           Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => HomePage()),
-          );
+              context, MaterialPageRoute(builder: (context) => HomePage()));
           break;
         case 1:
           Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => ProfilePage(currentUserId: '')),
-          );
+              context,
+              MaterialPageRoute(
+                  builder: (context) => ProfilePage(currentUserId: '')));
           break;
         case 2:
           Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => VehicleMonitoringPage(sensorName: widget.sensorName)),
-          );
+              context,
+              MaterialPageRoute(
+                  builder: (context) =>
+                      VehicleMonitoringPage(sensorName: widget.sensorName)));
           break;
         case 3:
           Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => SettingPage(currentUserId: '')),
-          );
+              context,
+              MaterialPageRoute(
+                  builder: (context) => SettingPage(currentUserId: '')));
           break;
       }
     });
@@ -110,86 +110,126 @@ class _VehicleMonitoringPageState extends State<VehicleMonitoringPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Vehicle Monitoring ${widget.sensorName}'),
-        backgroundColor: Colors.purple[100], // Set app bar background color to purple[200]
+        backgroundColor: Colors.purple[200],
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => HomePage()), // Pass childId here
-            );
+                context, MaterialPageRoute(builder: (context) => HomePage()));
           },
         ),
       ),
       body: SingleChildScrollView(
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.sensors, size: 100, color: Colors.purple[300]),
-                SizedBox(height: 20),
-                Text(
-                  'Sensor Name: ${widget.sensorName}',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.purple),
-                ),
-                SizedBox(height: 20),
-                isLoading
-                    ? SpinKitWave(color: Colors.purple[300], size: 50.0)
-                    : Column(
-                        children: [
-                          SensorTile(
-                            title: 'Temperature Monitoring',
-                            value: temperature,
-                            description: 'The temperature inside the car is constantly being tracked by the KidSafe app. In order to assist avoid heat-related illnesses or fatalities, carers get notifications when the temperature rises over acceptable limits.',
-                          ),
-                          TemperatureDiagram(temperature: temperature),
-                          SensorTile(
-                            title: 'Motion Monitoring',
-                            value: motion,
-                            description: 'This feature utilises motion sensors to monitor the child\'s movements in the car seat, ensuring their presence and safety. Carers are alerted if there are unexpected movements that could indicate a potential issue.',
-                          ),
-                          MotionDiagram(motion: motion),
-                        ],
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (isLoading)
+                Center(
+                    child: SpinKitWave(color: Colors.purple[300], size: 50.0))
+              else
+                Column(
+                  children: [
+                    // Temperature Gauge
+                    Column(
+                      children: [
+                        Text(
+                          'Temperature Gauge',
+                          style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.purple),
+                        ),
+                        SizedBox(height: 10),
+                        Container(
+                          width: 300,
+                          height: 300,
+                          child: TemperatureGauge(temperature: temperature),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 40),
+                    // Motion Indicator
+                    Column(
+                      children: [
+                        Text(
+                          'Motion Indicator',
+                          style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.purple),
+                        ),
+                        SizedBox(height: 10),
+                        Container(
+                          width: 300,
+                          height: 300,
+                          child: MotionIndicator(motion: motion),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 40),
+                    // Sensor Tiles for Temperature and Motion Status
+                    SensorTile(
+                      title: 'Temperature',
+                      value: temperature,
+                      description:
+                          'Monitoring the temperature to prevent heat-related issues.',
+                    ),
+                    SizedBox(height: 20),
+                    SensorTile(
+                      title: 'Motion Status',
+                      value: motion == '1' ? 'Motion Detected' : 'No Motion',
+                      description:
+                          'Detects motion to ensure child safety in the vehicle.',
+                    ),
+                    SizedBox(height: 40),
+                    ElevatedButton.icon(
+                      onPressed: fetchSensorData,
+                      icon: Icon(Icons.refresh),
+                      label: Text('Refresh Data'),
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        backgroundColor: Colors.purple[300],
+                        textStyle: TextStyle(fontSize: 18),
                       ),
-                SizedBox(height: 40),
-                ElevatedButton.icon(
-                  onPressed: fetchSensorData,
-                  icon: Icon(Icons.refresh),
-                  label: Text('Refresh Data'),
-                  style: ElevatedButton.styleFrom(
-                    primary: Colors.purple[300],
-                    onPrimary: Colors.white,
-                    textStyle: TextStyle(fontSize: 18),
-                  ),
+                    ),
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  IncidentHistoryPage()), // Navigate to the Incident History Page
+                        );
+                      },
+                      icon: Icon(Icons.history),
+                      label: Text('History Log'),
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        backgroundColor: Colors.purple[300],
+                        textStyle: TextStyle(fontSize: 18),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+            ],
           ),
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.purple[200], // Set background color to purple
+        backgroundColor: Colors.purple[200],
         items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.car_crash_rounded),
-            label: 'Vehicle Monitoring',
-          ),
+              icon: Icon(Icons.car_crash_rounded), label: 'Vehicle Monitoring'),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: Colors.white, // Set selected item color to white for better contrast
+        selectedItemColor: Colors.white,
         unselectedItemColor: Colors.black,
         onTap: _onItemTapped,
-        type: BottomNavigationBarType.fixed, // Ensure the type is fixed to display all items equally
+        type: BottomNavigationBarType.fixed,
       ),
     );
   }
@@ -210,21 +250,25 @@ class SensorTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 4,
+      elevation: 8,
       margin: EdgeInsets.symmetric(vertical: 10),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       child: Padding(
-        padding: const EdgeInsets.all(12.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               title,
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.purple),
+              style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.purple),
             ),
             SizedBox(height: 8),
             Text(
               'Value: $value',
-              style: TextStyle(fontSize: 18, color: Colors.purple[600]),
+              style: TextStyle(fontSize: 20, color: Colors.purple[600]),
             ),
             SizedBox(height: 8),
             Text(
@@ -238,65 +282,121 @@ class SensorTile extends StatelessWidget {
   }
 }
 
-class TemperatureDiagram extends StatelessWidget {
+class TemperatureGauge extends StatelessWidget {
   final String temperature;
 
-  const TemperatureDiagram({Key? key, required this.temperature}) : super(key: key);
+  const TemperatureGauge({Key? key, required this.temperature})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     double tempValue = double.tryParse(temperature) ?? 0;
-    String indicatorText;
-    Color bgColor;
-
-    if (tempValue <= 20) {
-      bgColor = Colors.blue;
-      indicatorText = 'Low';
-    } else if (tempValue <= 30) {
-      bgColor = Colors.green;
-      indicatorText = 'Okay';
-    } else if (tempValue <= 40) {
-      bgColor = Colors.yellow;
-      indicatorText = 'High';
-    } else {
-      bgColor = Colors.red;
-      indicatorText = 'High';
-    }
 
     return Container(
-      width: 200,
-      height: 30,
-      color: bgColor,
-      child: Center(
-        child: Text(
-          indicatorText,
-          style: TextStyle(fontSize: 16, color: Colors.white),
-        ),
+      padding: const EdgeInsets.all(16.0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.5),
+            spreadRadius: 3,
+            blurRadius: 7,
+            offset: Offset(0, 3),
+          ),
+        ],
+      ),
+      child: SfRadialGauge(
+        axes: <RadialAxis>[
+          RadialAxis(
+            minimum: -10,
+            maximum: 50,
+            ranges: <GaugeRange>[
+              GaugeRange(
+                startValue: -10,
+                endValue: 15,
+                color: Colors.yellow[200],
+                label: 'Cold',
+              ),
+              GaugeRange(
+                startValue: 15,
+                endValue: 40,
+                color: Colors.green[200],
+                label: 'Normal',
+              ),
+              GaugeRange(
+                startValue: 40,
+                endValue: 50,
+                color: Colors.red[200],
+                label: 'Hot',
+              ),
+            ],
+            pointers: <GaugePointer>[
+              NeedlePointer(
+                  value: tempValue,
+                  enableAnimation: true,
+                  needleColor: Colors.purple),
+            ],
+            annotations: <GaugeAnnotation>[
+              GaugeAnnotation(
+                widget: Container(
+                  child: Text(
+                    '$temperature°C',
+                    style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black),
+                  ),
+                ),
+                angle: 90,
+                positionFactor: 0.5,
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
 }
 
-class MotionDiagram extends StatelessWidget {
+class MotionIndicator extends StatelessWidget {
   final String motion;
 
-  const MotionDiagram({Key? key, required this.motion}) : super(key: key);
+  const MotionIndicator({Key? key, required this.motion}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    int motionValue = int.tryParse(motion) ?? 0;
-    String indicatorText = motionValue == 0 ? 'Low' : 'High';
-    Color bgColor = motionValue == 0 ? Colors.green : Colors.red;
+    bool isMotionDetected = motion == '1';
 
     return Container(
-      width: 200,
-      height: 30,
-      color: bgColor,
-      child: Center(
-        child: Text(
-          indicatorText,
-          style: TextStyle(fontSize: 16, color: Colors.white),
-        ),
+      padding: const EdgeInsets.all(16.0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.5),
+            spreadRadius: 3,
+            blurRadius: 7,
+            offset: Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            isMotionDetected ? Icons.directions_run : Icons.accessibility_new,
+            size: 100,
+            color: isMotionDetected ? Colors.red[200] : Colors.green[200],
+          ),
+          SizedBox(height: 20),
+          Text(
+            isMotionDetected ? 'Motion Detected' : 'No Motion',
+            style: TextStyle(
+                fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
+          ),
+        ],
       ),
     );
   }

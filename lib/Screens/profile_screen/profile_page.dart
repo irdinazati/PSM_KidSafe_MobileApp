@@ -231,7 +231,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                       ),
                       style: ElevatedButton.styleFrom(
-                        primary: Colors.purple[400],
+                        backgroundColor: Colors.purple[400],
                         shape: StadiumBorder(),
                         padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
                       ),

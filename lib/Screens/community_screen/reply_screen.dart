@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class ReplyScreen extends StatefulWidget {
   final String postId;
 
-  ReplyScreen({required this.postId});
+  const ReplyScreen({Key? key, required this.postId}) : super(key: key);
 
   @override
   _ReplyScreenState createState() => _ReplyScreenState();
@@ -12,17 +13,44 @@ class ReplyScreen extends StatefulWidget {
 
 class _ReplyScreenState extends State<ReplyScreen> {
   final TextEditingController _replyController = TextEditingController();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   Future<void> _submitReply() async {
     if (_replyController.text.isNotEmpty) {
+      User? currentUser = _auth.currentUser;
+
+      // Fetch parent details based on the current user's email
+      final parentData = await _fetchParentDetails(currentUser?.email);
+
       await FirebaseFirestore.instance.collection('posts').doc(widget.postId).collection('replies').add({
-        'author': 'current_user_email', // Replace with the current user's email or ID
+        'author': currentUser?.email ?? 'Anonymous',
         'content': _replyController.text,
         'timestamp': FieldValue.serverTimestamp(),
+        'authorName': parentData?['parentName'] ?? 'Anonymous', // Store the parent's name
+        'profilePicture': parentData?['profilePicture'], // Store the profile picture URL
       });
 
       _replyController.clear();
     }
+  }
+
+  Future<Map<String, dynamic>?> _fetchParentDetails(String? email) async {
+    if (email == null) return null;
+
+    final querySnapshot = await FirebaseFirestore.instance
+        .collection('parents')
+        .where('parentEmail', isEqualTo: email)
+        .limit(1)
+        .get();
+
+    if (querySnapshot.docs.isNotEmpty) {
+      final parentDoc = querySnapshot.docs.first;
+      return {
+        'parentName': parentDoc['parentName'],
+        'profilePicture': parentDoc['profilePicture'], // Fetch the profile picture URL
+      };
+    }
+    return null; // Return null if no parent found
   }
 
   @override
@@ -36,7 +64,12 @@ class _ReplyScreenState extends State<ReplyScreen> {
         children: [
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
-              stream: FirebaseFirestore.instance.collection('posts').doc(widget.postId).collection('replies').orderBy('timestamp', descending: true).snapshots(),
+              stream: FirebaseFirestore.instance
+                  .collection('posts')
+                  .doc(widget.postId)
+                  .collection('replies')
+                  .orderBy('timestamp', descending: true)
+                  .snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return Center(child: CircularProgressIndicator());
@@ -55,13 +88,20 @@ class _ReplyScreenState extends State<ReplyScreen> {
 
                       return ListTile(
                         leading: CircleAvatar(
-                          backgroundColor: Colors.grey[300],
-                          child: Text(
-                            replyData['author'][0].toUpperCase(),
-                            style: TextStyle(color: Colors.black),
-                          ),
+                          backgroundImage: NetworkImage(replyData['profilePicture'] ?? 'https://via.placeholder.com/150'), // Display profile picture
+                          radius: 20.0,
                         ),
-                        title: Text(replyData['author']),
+                        title: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(replyData['authorName'] ?? 'Anonymous', // Display parent's name
+                                style: TextStyle(fontWeight: FontWeight.bold)),
+                            Text(
+                              replyData['author'], // Display email below the name
+                              style: TextStyle(fontSize: 12.0, color: Colors.grey),
+                            ),
+                          ],
+                        ),
                         subtitle: Text(replyData['content']),
                         trailing: Text(
                           _formatTimestamp(replyData['timestamp']),
@@ -100,7 +140,8 @@ class _ReplyScreenState extends State<ReplyScreen> {
     );
   }
 
-  String _formatTimestamp(Timestamp timestamp) {
+  String _formatTimestamp(Timestamp? timestamp) {
+    if (timestamp == null) return '';
     final date = timestamp.toDate();
     final now = DateTime.now();
     final difference = now.difference(date);

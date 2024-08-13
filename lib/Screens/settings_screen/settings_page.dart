@@ -134,7 +134,7 @@ class _SettingPageState extends State<SettingPage> {
                 ),
               ),
               style: ElevatedButton.styleFrom(
-                primary: Colors.purple[100], // Set button color to green
+                backgroundColor: Colors.purple[100], // Set button color to green
                 elevation: 4,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
@@ -154,7 +154,7 @@ class _SettingPageState extends State<SettingPage> {
                 ),
               ),
               style: ElevatedButton.styleFrom(
-                primary: Colors.purple[100],
+                backgroundColor: Colors.purple[100],
                 elevation: 4,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),

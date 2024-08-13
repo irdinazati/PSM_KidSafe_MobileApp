@@ -141,7 +141,7 @@ class _DisplayChildProfileState extends State<DisplayChildProfile> {
                   });
                 },
                 style: ElevatedButton.styleFrom(
-                  primary: Colors.purple[400],
+                  backgroundColor: Colors.purple[400],
                   padding: EdgeInsets.symmetric(vertical: 12, horizontal: 32),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),

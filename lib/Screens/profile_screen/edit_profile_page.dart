@@ -325,7 +325,7 @@ class _ParentEditProfileState extends State<ParentEditProfile> {
                           updateParentProfile();
                         },
                         style: ElevatedButton.styleFrom(
-                          primary: Colors.purple[200],
+                          backgroundColor: Colors.purple[200],
                         ),
                         child: Text(
                           'Save Profile',
