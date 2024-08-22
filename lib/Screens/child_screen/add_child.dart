@@ -33,9 +33,8 @@ class _AddChildProfileState extends State<AddChildProfile> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => ChildInfoPage()), // Pass childId here
+            Navigator.pop(
+              context// Pass childId here
             );
           },
         ),
@@ -87,27 +86,6 @@ class _AddChildProfileState extends State<AddChildProfile> {
             ),
           ],
         ),
-      ),
-       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.purple[200], // Set background color to purple
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-           BottomNavigationBarItem(
-            icon: Icon(Icons.car_crash_outlined),
-            label: 'Vehicle Monitoring',
-          ),
-        ],
-        selectedItemColor: Colors.white, // Set selected item color to white for better contrast
-        unselectedItemColor: Colors.black,
-        onTap: _onItemTapped,
-        type: BottomNavigationBarType.fixed, // Ensure the type is fixed to display all items equally
       ),
     );
   }

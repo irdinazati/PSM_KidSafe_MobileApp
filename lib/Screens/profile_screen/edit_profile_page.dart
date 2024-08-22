@@ -109,35 +109,79 @@ class _ParentEditProfileState extends State<ParentEditProfile> {
 
   // Method to update the parent profile
   Future<void> updateParentProfile() async {
-    try {
-      User? parent = _auth.currentUser;
-      if (parent != null) {
-        // Update the profile picture if a new image is selected
-        if (_imageFile != null) {
-          String? profilePictureURL = await _uploadImage();
-          await _firestore
-              .collection('parents')
-              .doc(parent.uid)
-              .update({'profilePicture': profilePictureURL});
-        }
-
-        // Update all profile information
-        await _firestore.collection('parents').doc(parent.uid).update({
-          'parentName': parentNameController.text,
-          'parentFullName': parentFullNameController.text,
-          'parentPhoneNumber': parentPhoneController.text,
-          'parentEmail': parentEmailController.text,
-          'parentPassword': parentPasswordController.text,
-          'parentRePassword': parentRePasswordController.text,
-        });
-
-        // Show success message or navigate to a different screen
-        print('Profile updated successfully!');
+  try {
+    User? parent = _auth.currentUser;
+    if (parent != null) {
+      // Update the profile picture if a new image is selected
+      if (_imageFile != null) {
+        String? profilePictureURL = await _uploadImage();
+        await _firestore
+            .collection('parents')
+            .doc(parent.uid)
+            .update({'profilePicture': profilePictureURL});
       }
-    } catch (error) {
-      print('Error updating profile: $error');
+
+      // Update all profile information
+      await _firestore.collection('parents').doc(parent.uid).update({
+        'parentName': parentNameController.text,
+        'parentFullName': parentFullNameController.text,
+        'parentPhoneNumber': parentPhoneController.text,
+        'parentEmail': parentEmailController.text,
+        'parentPassword': parentPasswordController.text,
+        'parentRePassword': parentRePasswordController.text,
+      });
+
+      // Show success message or navigate to a different screen
+      print('Profile updated successfully!');
+
+      // Show a success dialog
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Success'),
+            content: Text('Profile updated successfully!'),
+            actions: <Widget>[
+              TextButton(
+                child: Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            ProfilePage(currentUserId: parent.uid)),
+                  );
+                },
+              ),
+            ],
+          );
+        },
+      );
     }
+  } catch (error) {
+    print('Error updating profile: $error');
+    // Show an error dialog if needed
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Error'),
+          content: Text('Failed to update profile. Please try again.'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
+}
+
 
  void _onItemTapped(int index) {
     setState(() {
@@ -177,19 +221,17 @@ class _ParentEditProfileState extends State<ParentEditProfile> {
         title: Text(
           "Parent Update Profile",
           style: TextStyle(
-            color: Colors.white,
+            color: const Color.fromARGB(255, 0, 0, 0),
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
           textAlign: TextAlign.left, // Align text to the left
         ),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          leading: IconButton(
+          icon: Icon(Icons.arrow_back,
+              color: Colors.black), // Use a color that fits your design
           onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => ProfilePage(currentUserId: '',)), // Pass childId here
-            );
+            Navigator.pop(context); // Navigate back to the previous screen
           },
         ),
       ),
@@ -340,27 +382,36 @@ class _ParentEditProfileState extends State<ParentEditProfile> {
           ),
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.purple[200], // Set background color to purple
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.car_crash_outlined),
-            label: 'Vehicle Monitoring',
-          ),
-        ],
-        selectedItemColor: Colors.white, // Set selected item color to white for better contrast
-        unselectedItemColor: Colors.black,
-        onTap: _onItemTapped,
-        type: BottomNavigationBarType.fixed, // Ensure the type is fixed to display all items equally
-      ),
+      // bottomNavigationBar: ConvexAppBar.badge(
+      //   {0: '99+', 1: Icons.assistant_photo, 2: Colors.redAccent},
+      //   items: [
+      //     TabItem(icon: Icons.home, title: 'Home'),
+      //     TabItem(icon: Icons.person, title: 'Profile'),
+      //     TabItem(icon: Icons.car_crash_outlined, title: 'Vehicle Monitoring'),
+      //   ],
+      //   onTap: (int i) {
+      //     switch (i) {
+      //       case 0:
+      //         Navigator.push(
+      //           context,
+      //           MaterialPageRoute(builder: (context) => HomePage()),
+      //         );
+      //         break;
+      //       case 1:
+      //         Navigator.push(
+      //           context,
+      //           MaterialPageRoute(builder: (context) => ProfilePage(currentUserId: '')),
+      //         );
+      //         break;
+      //       case 2:
+      //         Navigator.push(
+      //           context,
+      //           MaterialPageRoute(builder: (context) => VehicleMonitoringPage(sensorName: '',)),
+      //         );
+      //         break;
+      //     }
+      //   },
+      // ),
     );
   }
 }

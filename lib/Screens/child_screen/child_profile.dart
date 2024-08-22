@@ -10,6 +10,9 @@ import '../settings_screen/settings_page.dart';
 import 'child_homepage.dart';
 
 class DisplayChildProfile extends StatefulWidget {
+  final String? currentUserId;
+
+  const DisplayChildProfile({Key? key, this.currentUserId}) : super(key: key);
   @override
   _DisplayChildProfileState createState() => _DisplayChildProfileState();
 }
@@ -56,13 +59,11 @@ class _DisplayChildProfileState extends State<DisplayChildProfile> {
       appBar: AppBar(
         backgroundColor: Colors.purple[100],
         title: Text("Child Profile"),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          leading: IconButton(
+          icon: Icon(Icons.arrow_back,
+              color: Colors.black), // Use a color that fits your design
           onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => ChildInfoPage()), // Pass childId here
-            );
+            Navigator.pop(context); // Navigate back to the previous screen
           },
         ),
       ),
@@ -78,25 +79,36 @@ class _DisplayChildProfileState extends State<DisplayChildProfile> {
           },
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.notifications),
-            label: 'Notifications',
-          ),
-           BottomNavigationBarItem(
-            icon: Icon(Icons.car_crash_outlined),
-            label: 'Vehicle Monitoring',
-          ),
-
-        ],
-        selectedItemColor: Colors.purple,
-        onTap: _onItemTapped,
-      ),
+      // bottomNavigationBar: ConvexAppBar.badge(
+      //   {0: '99+', 1: Icons.assistant_photo, 2: Colors.redAccent},
+      //   items: [
+      //     TabItem(icon: Icons.home, title: 'Home'),
+      //     TabItem(icon: Icons.person, title: 'Profile'),
+      //     TabItem(icon: Icons.car_crash_outlined, title: 'Vehicle Monitoring'),
+      //   ],
+      //   onTap: (int i) {
+      //     switch (i) {
+      //       case 0:
+      //         Navigator.push(
+      //           context,
+      //           MaterialPageRoute(builder: (context) => HomePage()),
+      //         );
+      //         break;
+      //       case 1:
+      //         Navigator.push(
+      //           context,
+      //           MaterialPageRoute(builder: (context) => ProfilePage(currentUserId: '')),
+      //         );
+      //         break;
+      //       case 2:
+      //         Navigator.push(
+      //           context,
+      //           MaterialPageRoute(builder: (context) => VehicleMonitoringPage(sensorName: '',)),
+      //         );
+      //         break;
+      //     }
+      //   },
+      // ),
     );
   }
 

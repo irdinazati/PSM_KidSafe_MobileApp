@@ -3,6 +3,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fyp3/Screens/login_screen/login_page.dart';
 import 'package:fyp3/Screens/vehicle_monitoring_screen/vehicle_monitoring_page.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
+import '../../Controller/OneSignalController.dart';
+import '../../onboarding_screen.dart';
 import '../Google Login.dart';
 
 import '../../widget/profile_menu.dart';
@@ -29,11 +32,11 @@ class _ProfilePageState extends State<ProfilePage> {
     try {
       if (parent != null) {
         DocumentSnapshot documentSnapshot =
-        await _firestore.collection('parents').doc(parent.uid).get();
+            await _firestore.collection('parents').doc(parent.uid).get();
 
         if (documentSnapshot.exists) {
           Map<String, dynamic> parentData =
-          documentSnapshot.data() as Map<String, dynamic>;
+              documentSnapshot.data() as Map<String, dynamic>;
           parentData['parentProfilePicture'] =
               parentData['parentProfilePicture'] ?? '';
           return parentData;
@@ -59,7 +62,6 @@ class _ProfilePageState extends State<ProfilePage> {
           actions: <Widget>[
             TextButton(
               onPressed: () {
-
                 Navigator.of(context).pop(); // Close the dialog
               },
               child: Text(
@@ -72,9 +74,9 @@ class _ProfilePageState extends State<ProfilePage> {
             TextButton(
               onPressed: () async {
                 await _logout(); // Call the logout function if confirmed
+                //OneSignal.logout();
                 Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(builder: (context) => LoginPage())
-                );
+                    MaterialPageRoute(builder: (context) => OnBoardingScreen()));
                 // Close the dialog
               },
               child: Text(
@@ -115,21 +117,29 @@ class _ProfilePageState extends State<ProfilePage> {
           );
           break;
         case 1:
-        Navigator.push(
+          Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => ProfilePage(currentUserId: '',)),
+            MaterialPageRoute(
+                builder: (context) => ProfilePage(
+                      currentUserId: '',
+                    )),
           );
           break;
         case 2:
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => VehicleMonitoringPage(sensorName: '',)),
+            MaterialPageRoute(
+                builder: (context) => VehicleMonitoringPage(
+                      sensorName: '',
+                    )),
           );
           break;
         case 3:
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => SettingPage(currentUserId: widget.currentUserId)),
+            MaterialPageRoute(
+                builder: (context) =>
+                    SettingPage(currentUserId: widget.currentUserId)),
           );
           break;
       }
@@ -144,13 +154,12 @@ class _ProfilePageState extends State<ProfilePage> {
         backgroundColor: Colors.purple[100],
         title: Text("Parent User Profile"),
         centerTitle: true,
+        // automaticallyImplyLeading: false,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: Icon(Icons.arrow_back,
+              color: Colors.black), // Use a color that fits your design
           onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => HomePage()), // Pass childId here
-            );
+            Navigator.pop(context); // Navigate back to the previous screen
           },
         ),
       ),
@@ -226,14 +235,15 @@ class _ProfilePageState extends State<ProfilePage> {
                       onPressed: () => Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
-                          builder: (context) =>
-                              ParentEditProfile(currentUserId: widget.currentUserId),
+                          builder: (context) => ParentEditProfile(
+                              currentUserId: widget.currentUserId),
                         ),
                       ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.purple[400],
                         shape: StadiumBorder(),
-                        padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                        padding:
+                            EdgeInsets.symmetric(vertical: 12, horizontal: 24),
                       ),
                       child: Text(
                         "Edit Profile",
@@ -256,7 +266,9 @@ class _ProfilePageState extends State<ProfilePage> {
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => SettingPage(currentUserId: '',),
+                            builder: (context) => SettingPage(
+                              currentUserId: '',
+                            ),
                           ),
                         );
                       },
@@ -284,28 +296,36 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.purple[200], // Set background color to purple
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.car_crash_outlined),
-            label: 'Vehicle Monitoring',
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: Colors.white, // Set selected item color to white for better contrast
-        unselectedItemColor: Colors.black,
-        onTap: _onItemTapped,
-        type: BottomNavigationBarType.fixed, // Ensure the type is fixed to display all items equally
-      ),
+      // bottomNavigationBar: ConvexAppBar.badge(
+      //   {0: '99+', 1: Icons.assistant_photo, 2: Colors.redAccent},
+      //   items: [
+      //     TabItem(icon: Icons.home, title: 'Home'),
+      //     TabItem(icon: Icons.person, title: 'Profile'),
+      //     TabItem(icon: Icons.car_crash_outlined, title: 'Vehicle Monitoring'),
+      //   ],
+      //   onTap: (int i) {
+      //     switch (i) {
+      //       case 0:
+      //         Navigator.push(
+      //           context,
+      //           MaterialPageRoute(builder: (context) => HomePage()),
+      //         );
+      //         break;
+      //       case 1:
+      //         Navigator.push(
+      //           context,
+      //           MaterialPageRoute(builder: (context) => ProfilePage(currentUserId: '')),
+      //         );
+      //         break;
+      //       case 2:
+      //         Navigator.push(
+      //           context,
+      //           MaterialPageRoute(builder: (context) => VehicleMonitoringPage(sensorName: '',)),
+      //         );
+      //         break;
+      //     }
+      //   },
+      // ),
     );
   }
 }

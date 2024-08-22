@@ -11,8 +11,9 @@ class FeedbackListPage extends StatefulWidget {
 class _FeedbackListPageState extends State<FeedbackListPage> {
   List<FeedbackModel> feedbackList = [];
   List<FeedbackModel> allFeedback = [];
-  double averageRating = 0.0;
   double selectedRatingFilter = 0;
+  Map<int, double> ratingDistribution = {};
+  double averageRating = 0.0;
 
   @override
   void initState() {
@@ -37,12 +38,20 @@ class _FeedbackListPageState extends State<FeedbackListPage> {
         );
       }).toList();
 
-      // Compute average rating from all feedback
+      // Calculate the distribution of ratings
+      Map<int, double> distribution = {};
+      for (var i = 1; i <= 5; i++) {
+        int count = feedback.where((item) => item.rating == i.toDouble()).length;
+        distribution[i] = feedback.isNotEmpty ? (count / feedback.length) * 100 : 0;
+      }
+
+      // Calculate average rating
       double totalRating = feedback.fold(0, (sum, item) => sum + item.rating);
       double avgRating = feedback.isNotEmpty ? totalRating / feedback.length : 0;
 
       setState(() {
         allFeedback = feedback;
+        ratingDistribution = distribution;
         averageRating = avgRating;
         // Apply rating filter if provided
         feedbackList = ratingFilter != null && ratingFilter > 0
@@ -62,6 +71,12 @@ class _FeedbackListPageState extends State<FeedbackListPage> {
       appBar: AppBar(
         backgroundColor: Colors.purple[100],
         title: Text('All Feedback'),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
       ),
       body: Column(
         children: [
@@ -71,35 +86,35 @@ class _FeedbackListPageState extends State<FeedbackListPage> {
             height: 250, // Adjust height as needed
             child: PieChart(
               PieChartData(
-                sections: [
-                  PieChartSectionData(
-                    value: averageRating,
-                    color: Colors.purple.shade300,
-                    title: '${averageRating.toStringAsFixed(1)}',
+                sections: ratingDistribution.entries.map((entry) {
+                  final rating = entry.key;
+                  final value = entry.value;
+                  final color = _getColorForRating(rating);
+                  return PieChartSectionData(
+                    value: value,
+                    color: color,
+                    title: '$rating Stars\n${value.toStringAsFixed(1)}%',
                     radius: 50,
-                    titleStyle: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                  ),
-                  PieChartSectionData(
-                    value: 5 - averageRating,
-                    color: Colors.grey,
-                    title: '',
-                    radius: 50,
-                  ),
-                ],
+                    titleStyle: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  );
+                }).toList(),
                 centerSpaceRadius: 40,
                 sectionsSpace: 2,
               ),
             ),
           ),
-          // Average Rating Text
+          // Average Rating Statement
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(8.0),
             child: Text(
-              'Average Rating: ${averageRating.toStringAsFixed(1)}/5',
+              'Average Rating: ${averageRating.toStringAsFixed(1)} / 5 Stars',
               style: TextStyle(
-                fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Colors.purple[800],
+                fontSize: 18,
               ),
             ),
           ),
@@ -183,5 +198,23 @@ class _FeedbackListPageState extends State<FeedbackListPage> {
         ],
       ),
     );
+  }
+
+  // Helper function to get color for each rating
+  Color? _getColorForRating(int rating) {
+    switch (rating) {
+      case 1:
+        return const Color.fromARGB(255, 250, 192, 192);
+      case 2:
+        return const Color.fromARGB(255, 222, 196, 156);
+      case 3:
+        return const Color.fromARGB(255, 231, 222, 142);
+      case 4:
+        return const Color.fromARGB(255, 176, 205, 143);
+      case 5:
+        return Colors.blue[100];
+      default:
+        return Colors.grey;
+    }
   }
 }

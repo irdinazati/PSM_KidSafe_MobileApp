@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+<<<<<<< HEAD
+=======
+import 'package:fyp3/Screens/home_screen/homepage.dart';
+import 'package:fyp3/Screens/profile_screen/profile_page.dart';
+import 'package:fyp3/Screens/vehicle_monitoring_screen/vehicle_monitoring_page.dart';
+>>>>>>> 6240b91 (new updated)
 import 'post_screen.dart';
 import 'post_widget.dart';
 
@@ -28,13 +34,34 @@ class _CommunityScreenState extends State<CommunityScreen> {
             onPressed: showSearchDialog,
           ),
         ],
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back,
+              color: Colors.black), // Use a color that fits your design
+          onPressed: () {
+            Navigator.pop(context); // Navigate back to the previous screen
+          },
+        ),
       ),
       body: StreamBuilder<QuerySnapshot>(
+<<<<<<< HEAD
         stream: FirebaseFirestore.instance
             .collection('posts')
             .where('title', isGreaterThanOrEqualTo: _searchKeyword)
             .where('title', isLessThanOrEqualTo: '$_searchKeyword\uf8ff')
             .snapshots(),
+=======
+        stream: (_searchKeyword.isEmpty)
+            ? FirebaseFirestore.instance
+                .collection('posts')
+                .orderBy('timestamp', descending: true)
+                .snapshots()
+            : FirebaseFirestore.instance
+                .collection('posts')
+                .where('title', isGreaterThanOrEqualTo: _searchKeyword)
+                .where('title', isLessThanOrEqualTo: '$_searchKeyword\uf8ff')
+                .orderBy('title')
+                .snapshots(),
+>>>>>>> 6240b91 (new updated)
         builder: (context, titleSnapshot) {
           if (titleSnapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
@@ -53,7 +80,12 @@ class _CommunityScreenState extends State<CommunityScreen> {
                 postId: post.id,
                 postData: post.data() as Map<String, dynamic>,
                 currentUserId: widget.currentUserId,
+<<<<<<< HEAD
                 timestamp: post['timestamp'], // Pass the timestamp to PostWidget
+=======
+                timestamp:
+                    post['timestamp'], // Pass the timestamp to PostWidget
+>>>>>>> 6240b91 (new updated)
               );
             },
           );
@@ -69,6 +101,36 @@ class _CommunityScreenState extends State<CommunityScreen> {
         child: Icon(Icons.add),
         backgroundColor: Colors.purple[200],
       ),
+      // bottomNavigationBar: ConvexAppBar.badge(
+      //   {0: '99+', 1: Icons.assistant_photo, 2: Colors.redAccent},
+      //   items: [
+      //     TabItem(icon: Icons.home, title: 'Home'),
+      //     TabItem(icon: Icons.person, title: 'Profile'),
+      //     TabItem(icon: Icons.car_crash_outlined, title: 'Vehicle Monitoring'),
+      //   ],
+      //   onTap: (int i) {
+      //     switch (i) {
+      //       case 0:
+      //         Navigator.push(
+      //           context,
+      //           MaterialPageRoute(builder: (context) => HomePage()),
+      //         );
+      //         break;
+      //       case 1:
+      //         Navigator.push(
+      //           context,
+      //           MaterialPageRoute(builder: (context) => ProfilePage(currentUserId: '')),
+      //         );
+      //         break;
+      //       case 2:
+      //         Navigator.push(
+      //           context,
+      //           MaterialPageRoute(builder: (context) => VehicleMonitoringPage(sensorName: '',)),
+      //         );
+      //         break;
+      //     }
+      //   },
+      // ),
     );
   }
 

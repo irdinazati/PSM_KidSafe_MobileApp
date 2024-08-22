@@ -1,11 +1,13 @@
 import 'package:animate_do/animate_do.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:fyp3/Screens/vehicle_monitoring_screen/vehicle_monitoring_page.dart';
-import '../home_screen/homepage.dart';
-import '../profile_screen/profile_page.dart';
-import '../settings_screen/settings_page.dart';
+import 'package:fyp3/Screens/child_screen/feeling_summary.dart';
+import '../../Models/child.dart';
 import 'add_child.dart';
+import 'add_feelings.dart';
 import 'child_profile.dart';
+import 'tracking.dart'; // Adjust the import based on your project structure
 
 class ChildInfoPage extends StatefulWidget {
   final String? currentUserId;
@@ -17,6 +19,91 @@ class ChildInfoPage extends StatefulWidget {
 }
 
 class _ChildInfoPageState extends State<ChildInfoPage> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final _feelingsController = TextEditingController();
+  String? _selectedFeeling;
+  String? _selectedChildId;
+  List<ChildModel> _children = [];
+  List<String> _feelingsOptions = ['Happy', 'Sad', 'Angry', 'Excited', 'Tired'];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadChildInfo();
+  }
+
+  Future<void> _loadChildInfo() async {
+    try {
+      String parentId = _auth.currentUser?.uid ?? '';
+      QuerySnapshot<Map<String, dynamic>> querySnapshot = await _firestore
+          .collection('parents')
+          .doc(parentId)
+          .collection('children')
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        List<ChildModel> children = querySnapshot.docs.map((doc) {
+          return ChildModel.fromDoc(doc);
+        }).toList();
+
+        setState(() {
+          _children = children;
+        });
+      }
+    } catch (error) {
+      print('Error loading child info: $error');
+    }
+  }
+
+  Future<void> _submitFeeling() async {
+    if (_selectedFeeling != null && _selectedChildId != null) {
+      try {
+        DocumentSnapshot<Map<String, dynamic>> childDoc = await _firestore
+            .collection('parents')
+            .doc(_auth.currentUser?.uid)
+            .collection('children')
+            .doc(_selectedChildId)
+            .get();
+
+        if (childDoc.exists) {
+          String childName = childDoc.data()?['childFullName'] ?? 'Unknown';
+
+          await _firestore.collection('child_feelings').add({
+            'userId': _auth.currentUser?.uid,
+            'childId': _selectedChildId,
+            'childName': childName,
+            'feeling': _selectedFeeling,
+            'date': DateTime.now(),
+          });
+
+          _showSuccessSnackbar('Feeling submitted successfully!');
+          setState(() {
+            _selectedFeeling = null;
+            _selectedChildId = null;
+          });
+        } else {
+          _showErrorSnackbar('Selected child does not exist.');
+        }
+      } catch (e) {
+        _showErrorSnackbar('Error submitting feeling: $e');
+      }
+    } else {
+      _showErrorSnackbar('Please select a feeling and a child.');
+    }
+  }
+
+  void _showErrorSnackbar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
+
+  void _showSuccessSnackbar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,31 +113,30 @@ class _ChildInfoPageState extends State<ChildInfoPage> {
         elevation: 0,
         backgroundColor: Colors.purple[100],
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => HomePage()), // Pass childId here
-            );
+            Navigator.pop(context);
           },
         ),
         title: Text("Child Information"),
+        centerTitle: true,
       ),
-      body: Center( // Center widget added here
+      body: Center(
         child: SingleChildScrollView(
+          padding: EdgeInsets.symmetric(horizontal: 16.0),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center, // Center content vertically
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              SizedBox(height: 40),
+              SizedBox(height: 20),
               FadeInUp(
-                duration: Duration(milliseconds: 1000),
+                duration: Duration(milliseconds: 800),
                 child: Image.asset(
                   'assets/child.png',
-                  height: MediaQuery.of(context).size.height / 3,
+                  height: MediaQuery.of(context).size.height / 4,
                   fit: BoxFit.cover,
                 ),
               ),
-              SizedBox(height: 30),
+              SizedBox(height: 20),
               _buildMenuItem(
                 title: "Display Child Profile",
                 icon: Icons.child_care,
@@ -77,30 +163,49 @@ class _ChildInfoPageState extends State<ChildInfoPage> {
                 },
               ),
               _buildDivider(),
+              _buildMenuItem(
+                title: "Daily Feelings Submission",
+                icon: Icons.face,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AddFeelingsPage(),
+                    ),
+                  );
+                },
+              ),
+              _buildDivider(),
+              _buildMenuItem(
+                title: "Summary of Child Feelings",
+                icon: Icons.timeline,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => FeelingsPage(
+                          currentUserId: widget.currentUserId),
+                    ),
+                  );
+                },
+              ),
+              _buildDivider(),
+              _buildMenuItem(
+                title: "Drop-Off/Pick-Up Tracking",
+                icon: Icons.car_crash,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => DropOffPickUpTrackingPage(
+                          currentUserId: widget.currentUserId),
+                    ),
+                  );
+                },
+              ),
             ],
           ),
         ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.purple[200],
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-           BottomNavigationBarItem(
-            icon: Icon(Icons.car_crash_outlined),
-            label: 'Vehicle Monitoring',
-          ),
-        ],
-        selectedItemColor: Colors.white,
-        unselectedItemColor: Colors.black,
-        onTap: _onItemTapped,
-        type: BottomNavigationBarType.fixed,
       ),
     );
   }
@@ -111,50 +216,22 @@ class _ChildInfoPageState extends State<ChildInfoPage> {
     required VoidCallback onTap,
   }) {
     return ListTile(
-      title: Text(title),
-      leading: Icon(icon),
+      title: Text(
+        title,
+        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+      ),
+      leading: Icon(icon, color: Colors.purple[700]),
       onTap: onTap,
     );
   }
 
   Widget _buildDivider() {
     return Divider(
-      color: Colors.grey,
-      height: 15,
+      color: Colors.grey[300],
+      height: 20,
       thickness: 1,
       indent: 15,
       endIndent: 15,
     );
-  }
-
-  void _onItemTapped(int index) {
-    setState(() {
-      switch (index) {
-        case 0:
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => HomePage(currentUserId: widget.currentUserId)),
-          );
-          break;
-        case 1:
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => ProfilePage(currentUserId: '')),
-          );
-          break;
-        case 2:
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => VehicleMonitoringPage(sensorName: '',)),
-          );
-          break;
-        case 3:
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => SettingPage(currentUserId: widget.currentUserId)),
-          );
-          break;
-      }
-    });
   }
 }

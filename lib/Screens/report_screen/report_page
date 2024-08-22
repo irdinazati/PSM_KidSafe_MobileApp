@@ -1,0 +1,109 @@
+// import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'package:fl_chart/fl_chart.dart';
+// import 'package:flutter/material.dart';
+
+// class ReportPage extends StatelessWidget {
+//   const ReportPage({Key? key}) : super(key: key);
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(title: Text('Sensor Data Report')),
+//       body: StreamBuilder<QuerySnapshot>(
+//         stream: FirebaseFirestore.instance
+//             .collection('sensor_data')
+//             .orderBy('timestamp')
+//             .snapshots(),
+//         builder: (context, snapshot) {
+//           if (snapshot.connectionState == ConnectionState.waiting) {
+//             return Center(child: CircularProgressIndicator());
+//           }
+//           if (snapshot.hasError) {
+//             return Center(child: Text('Error: ${snapshot.error}'));
+//           }
+
+//           final data = snapshot.data?.docs;
+//           if (data == null || data.isEmpty) {
+//             return Center(child: Text('No data available.'));
+//           }
+
+//           // Count occurrences of motion = 1
+//           int motionCount = data.where((doc) {
+//             try {
+//               final motion = doc.get('motion') as int?;
+//               return motion == 1;
+//             } catch (e) {
+//               print('Error processing document: $e');
+//               return false;
+//             }
+//           }).length;
+
+//           return Padding(
+//             padding: const EdgeInsets.all(16.0),
+//             child: Column(
+//               children: [
+//                 Text(
+//                   'Summary of Motion Events',
+//                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+//                 ),
+//                 SizedBox(height: 20),
+//                 BarChart(
+//                   BarChartData(
+//                     gridData: FlGridData(show: false),
+//                     titlesData: FlTitlesData(
+//                       bottomTitles: AxisTitles(
+//                         sideTitles: SideTitles(
+//                           showTitles: true,
+//                           reservedSize: 40,
+//                           sideTitleWidget: (value, meta) {
+//                             return SideTitleWidget(
+//                               axisSide: meta.axisSide,
+//                               child: Text('Motion Detected'),
+//                             );
+//                           },
+//                         ),
+//                       ),
+//                       leftTitles: AxisTitles(
+//                         sideTitles: SideTitles(
+//                           showTitles: true,
+//                           reservedSize: 40,
+//                           sideTitleWidget: (value, meta) {
+//                             return SideTitleWidget(
+//                               axisSide: meta.axisSide,
+//                               child: Text(value.toString()),
+//                             );
+//                           },
+//                         ),
+//                       ),
+//                     ),
+//                     borderData: FlBorderData(
+//                       show: true,
+//                       border: Border.all(color: Colors.grey, width: 1),
+//                     ),
+//                     barGroups: [
+//                       BarChartGroupData(
+//                         x: 0,
+//                         barRods: [
+//                           BarChartRodData(
+//                             toY: motionCount.toDouble(),
+//                             color: Colors.blue,
+//                             width: 40,
+//                           ),
+//                         ],
+//                       ),
+//                     ],
+//                   ),
+//                 ),
+//                 SizedBox(height: 20),
+//                 Text(
+//                   'Total Motion Detected: $motionCount',
+//                   style: TextStyle(fontSize: 16),
+//                 ),
+//               ],
+//             ),
+//           );
+//         },
+//       ),
+//     );
+//   }
+// }

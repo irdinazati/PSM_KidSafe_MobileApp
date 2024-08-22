@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+<<<<<<< HEAD
+=======
+import 'package:fyp3/Screens/home_screen/homepage.dart';
+import 'package:fyp3/Screens/profile_screen/profile_page.dart';
+import 'package:fyp3/Screens/vehicle_monitoring_screen/vehicle_monitoring_page.dart';
+>>>>>>> 6240b91 (new updated)
 
 class ReplyScreen extends StatefulWidget {
   final String postId;
@@ -59,6 +65,13 @@ class _ReplyScreenState extends State<ReplyScreen> {
       appBar: AppBar(
         title: Text('Replies'),
         backgroundColor: Colors.purple[200],
+          leading: IconButton(
+          icon: Icon(Icons.arrow_back,
+              color: Colors.black), // Use a color that fits your design
+          onPressed: () {
+            Navigator.pop(context); // Navigate back to the previous screen
+          },
+        ),
       ),
       body: Column(
         children: [
@@ -137,6 +150,36 @@ class _ReplyScreenState extends State<ReplyScreen> {
           ),
         ],
       ),
+      // bottomNavigationBar: ConvexAppBar.badge(
+      //   {0: '99+', 1: Icons.assistant_photo, 2: Colors.redAccent},
+      //   items: [
+      //     TabItem(icon: Icons.home, title: 'Home'),
+      //     TabItem(icon: Icons.person, title: 'Profile'),
+      //     TabItem(icon: Icons.car_crash_outlined, title: 'Vehicle Monitoring'),
+      //   ],
+      //   onTap: (int i) {
+      //     switch (i) {
+      //       case 0:
+      //         Navigator.push(
+      //           context,
+      //           MaterialPageRoute(builder: (context) => HomePage()),
+      //         );
+      //         break;
+      //       case 1:
+      //         Navigator.push(
+      //           context,
+      //           MaterialPageRoute(builder: (context) => ProfilePage(currentUserId: '')),
+      //         );
+      //         break;
+      //       case 2:
+      //         Navigator.push(
+      //           context,
+      //           MaterialPageRoute(builder: (context) => VehicleMonitoringPage(sensorName: '',)),
+      //         );
+      //         break;
+      //     }
+      //   },
+      // ),
     );
   }
 

@@ -5,6 +5,7 @@ import 'package:animate_do/animate_do.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fyp3/Models/parent.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fyp3/Screens/home_screen/homepage.dart';
 import 'package:fyp3/Screens/login_screen/forgot_password_page.dart';
@@ -72,41 +73,46 @@ class _LoginPageState extends State<LoginPage> {
 
 
  Future<void> signIn(BuildContext context) async {
-  try {
-    UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: emailController.text, password: passwordController.text);
+    try {
+      UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+          email: emailController.text, password: passwordController.text);
 
-    // Successfully logged in, fetch the current user's UID
-    String? uid = FirebaseAuth.instance.currentUser?.uid;
+      // Successfully logged in, fetch the current user's UID
+      String? uid = FirebaseAuth.instance.currentUser?.uid;
 
-    // Get the user's status from Firestore using ParentModel.fromDoc
-    ParentModel userModel = ParentModel.fromDoc(await getUserDoc(uid)); 
+      // Get the user's status from Firestore using ParentModel.fromDoc
+      ParentModel userModel = ParentModel.fromDoc(await getUserDoc(uid)); 
 
-    if (userModel.status == "Active") {
-      print('userid=${uid}');
-      // If status is "Active", proceed to the home screen
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => HomePage(currentUserId: uid)),
-      );
-    } else {
-      // If status is not "Active", show a dialog indicating that the account is inactive
-      _showDeactivatedAccountDialog(context);
-      // Sign out the user since the account is inactive
-      await FirebaseAuth.instance.signOut();
+      if (userModel.status == "Active") {
+        print('userid=${uid}');
+
+        // Log in the user with OneSignal
+        OneSignal.login(uid!);  // Assign the UID to OneSignal
+
+        // If status is "Active", proceed to the home screen
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => HomePage(currentUserId: uid)),
+        );
+      } else {
+        // If status is not "Active", show a dialog indicating that the account is inactive
+        _showDeactivatedAccountDialog(context);
+        // Sign out the user since the account is inactive
+        await FirebaseAuth.instance.signOut();
+      }
+    } on FirebaseAuthException catch (e) {
+      // Handle login errors
+      if (e.code == 'user-not-found') {
+        print('No user found for that email.');
+      } else if (e.code == 'wrong-password') {
+        print('Wrong password provided for that user.');
+      }
+      // Display error to user
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Failed to sign in: ${e.message}')));
     }
-  } on FirebaseAuthException catch (e) {
-    // Handle login errors
-    if (e.code == 'user-not-found') {
-      print('No user found for that email.');
-    } else if (e.code == 'wrong-password') {
-      print('Wrong password provided for that user.');
-    }
-    // Display error to user
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text('Failed to sign in: ${e.message}')));
   }
-}
+
 
  Future<List<FeedbackModel>> fetchFeedback() async {
   QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('feedback').get();
@@ -139,8 +145,11 @@ class _LoginPageState extends State<LoginPage> {
       // Successful login
       final String? uid = user?.uid;
 
+      // Log in the user with OneSignal
+      OneSignal.login(uid!);  // Assign the UID to OneSignal
+
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setString("loggedUserId", uid!);
+      await prefs.setString("loggedUserId", uid);
       await prefs.setString("usertype", "Parent");
 
       ArtSweetAlert.show(
@@ -170,7 +179,6 @@ class _LoginPageState extends State<LoginPage> {
       );
     }
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -179,16 +187,17 @@ class _LoginPageState extends State<LoginPage> {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.purple[50],
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: Icon(
-            Icons.arrow_back_ios,
-            size: 20,
-            color: Colors.black,
-          ),
-        ),
+        automaticallyImplyLeading: false,
+        // leading: IconButton(
+        //   onPressed: () {
+        //     Navigator.pop(context);
+        //   },
+        //   icon: Icon(
+        //     Icons.arrow_back_ios,
+        //     size: 20,
+        //     color: Colors.black,
+        //   ),
+        // ),
       ),
       body: SingleChildScrollView(
         child: Column(

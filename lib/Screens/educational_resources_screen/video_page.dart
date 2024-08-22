@@ -99,13 +99,11 @@ class _VideoPageState extends State<VideoPage> {
       appBar: AppBar(
         title: Text('Video Page'),
         backgroundColor: Colors.purple[200],
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          leading: IconButton(
+          icon: Icon(Icons.arrow_back,
+              color: Colors.black), // Use a color that fits your design
           onPressed: () {
-            Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => EducationalResourcesPage()),
-          );
+            Navigator.pop(context); // Navigate back to the previous screen
           },
         ),
       ),
@@ -163,27 +161,36 @@ class _VideoPageState extends State<VideoPage> {
           ),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.purple[200], // Set background color to purple
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.car_crash_outlined),
-            label: 'Vehicle Monitoring',
-          ),
-        ],
-        selectedItemColor: Colors.white, // Set selected item color to white for better contrast
-        unselectedItemColor: Colors.black,
-        onTap: _onItemTapped,
-        type: BottomNavigationBarType.fixed, // Ensure the type is fixed to display all items equally
-      ),
+      // bottomNavigationBar: ConvexAppBar.badge(
+      //   {0: '99+', 1: Icons.assistant_photo, 2: Colors.redAccent},
+      //   items: [
+      //     TabItem(icon: Icons.home, title: 'Home'),
+      //     TabItem(icon: Icons.person, title: 'Profile'),
+      //     TabItem(icon: Icons.car_crash_outlined, title: 'Vehicle Monitoring'),
+      //   ],
+      //   onTap: (int i) {
+      //     switch (i) {
+      //       case 0:
+      //         Navigator.push(
+      //           context,
+      //           MaterialPageRoute(builder: (context) => HomePage()),
+      //         );
+      //         break;
+      //       case 1:
+      //         Navigator.push(
+      //           context,
+      //           MaterialPageRoute(builder: (context) => ProfilePage(currentUserId: '')),
+      //         );
+      //         break;
+      //       case 2:
+      //         Navigator.push(
+      //           context,
+      //           MaterialPageRoute(builder: (context) => VehicleMonitoringPage(sensorName: '',)),
+      //         );
+      //         break;
+      //     }
+      //   },
+      // ),
     );
   }
 }

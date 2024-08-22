@@ -1,4 +1,8 @@
 import 'dart:async';
+<<<<<<< HEAD
+=======
+import 'package:cloud_firestore/cloud_firestore.dart';
+>>>>>>> 6240b91 (new updated)
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fyp3/Screens/community_screen/community_page.dart';
@@ -9,7 +13,13 @@ import 'package:fyp3/Screens/settings_screen/settings_page.dart';
 import 'package:fyp3/Screens/vehicle_monitoring_screen/vehicle_monitoring_page.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+<<<<<<< HEAD
 import '../child_screen/child_homepage.dart';
+=======
+import '../../Controller/OneSignalController.dart';
+import '../child_screen/child_homepage.dart';
+import '../notification_screen/controllers.dart';
+>>>>>>> 6240b91 (new updated)
 
 class HomePage extends StatefulWidget {
   final String? currentUserId;
@@ -18,6 +28,7 @@ class HomePage extends StatefulWidget {
 
   @override
   State<HomePage> createState() => _HomePageState();
+  
 }
 
 class _HomePageState extends State<HomePage> {
@@ -26,6 +37,7 @@ class _HomePageState extends State<HomePage> {
   double _temperature = 0.0; // Initialize with a default temperature
   Timer? _timer; // Timer instance for the message sending duration
   bool _isLoading = true; // Add this to your state
+<<<<<<< HEAD
 
   @override
   void initState() {
@@ -98,6 +110,91 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
+=======
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchThingSpeakData(); // Fetch data when the widget is initialized
+    print("UID: ${widget.currentUserId!}");
+    initiateSensorsAndNotifications(widget.currentUserId!); // Start sensor checks
+  }
+  
+Future<void> fetchThingSpeakData() async {
+  final String url =
+      'https://api.thingspeak.com/channels/2554215/feeds.json?api_key=GQXZ7HQWUIPKL9I8&results=1';
+
+  try {
+    final response = await http.get(Uri.parse(url));
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      final int motionStatus =
+          int.parse(data['feeds'][0]['field2']); // Adjust as needed
+      final double temperature =
+          double.parse(data['feeds'][0]['field1']); // Adjust as needed
+
+      // Save to Firestore
+      await _firestore.collection('sensor_data').add({
+        'timestamp': Timestamp.now(),
+        'motion_status': motionStatus,
+        'temperature': temperature,
+      });
+
+      setState(() {
+        _motionStatus = motionStatus;
+        _temperature = temperature;
+        _isLoading = false; // Data loaded successfully
+      });
+    } else {
+      throw Exception('Failed to load data');
+    }
+  } catch (e) {
+    print(e);
+    // Handle error by showing a snackbar
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Error fetching data: $e')),
+    );
+    setState(() {
+      _isLoading = false; // Stop loading on error
+    });
+  }
+}
+
+  // void _onItemTapped(int index) {
+  //   if (index != _selectedIndex) {
+  //     setState(() {
+  //       _selectedIndex = index;
+  //     });
+  //     switch (index) {
+  //       case 0:
+  //         Navigator.pushReplacement(
+  //           context,
+  //           MaterialPageRoute(
+  //               builder: (context) =>
+  //                   HomePage(currentUserId: widget.currentUserId)),
+  //         );
+  //         break;
+  //       case 1:
+  //         Navigator.pushReplacement(
+  //           context,
+  //           MaterialPageRoute(
+  //               builder: (context) => ProfilePage(currentUserId: '')),
+  //         );
+  //         break;
+  //       case 2:
+  //         Navigator.pushReplacement(
+  //           context,
+  //           MaterialPageRoute(
+  //               builder: (context) => VehicleMonitoringPage(sensorName: '')),
+  //         );
+  //         break;
+  //     }
+  //   }
+  // }
+
+ @override
+>>>>>>> 6240b91 (new updated)
 Widget build(BuildContext context) {
   return Scaffold(
     body: _isLoading
@@ -106,13 +203,21 @@ Widget build(BuildContext context) {
             padding: EdgeInsets.zero,
             children: [
               _buildAppBar(context),
+<<<<<<< HEAD
+=======
+              const SizedBox(height: 30),
+              _buildConclusion(),
+>>>>>>> 6240b91 (new updated)
               _buildIndicators(),
               _buildImage(),
               _buildDashboard(),
               const SizedBox(height: 20),
             ],
           ),
+<<<<<<< HEAD
     bottomNavigationBar: _buildBottomNavigationBar(),
+=======
+>>>>>>> 6240b91 (new updated)
   );
 }
 
@@ -195,6 +300,10 @@ Widget build(BuildContext context) {
             ),
           ],
         ),
+<<<<<<< HEAD
+=======
+        
+>>>>>>> 6240b91 (new updated)
         child: Column(
           children: [
             Row(
@@ -256,6 +365,73 @@ Widget build(BuildContext context) {
     );
   }
 
+<<<<<<< HEAD
+=======
+  Widget _buildConclusion() {
+  String conclusionMessage;
+  IconData alertIcon;
+
+  if (_motionStatus == 0) {
+    conclusionMessage = 'The kid is not in the car.';
+    alertIcon = Icons.check_circle; // Check mark for no issue
+  } else {
+    conclusionMessage = 'The kid is in the car!';
+    alertIcon = Icons.warning; // Warning icon for alert
+  }
+
+  return Container(
+    padding: const EdgeInsets.all(15).copyWith(top: 30), // Add top padding
+    decoration: BoxDecoration(
+      color: Colors.purple[300], // Purple color for the box
+      borderRadius: BorderRadius.circular(10),
+      boxShadow: [
+        BoxShadow(
+          offset: const Offset(0, 5),
+          color: Colors.purple.withOpacity(.2), // Light purple shadow
+          spreadRadius: 2,
+          blurRadius: 5,
+        ),
+      ],
+    ),
+    margin: const EdgeInsets.symmetric(horizontal: 30), // Align with other widgets
+    child: Padding(
+      padding: const EdgeInsets.only(top: 20.0), // Add top padding
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center, // Center the content
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.white, // White background for the icon
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              alertIcon,
+              color: Colors.purple[100],
+              size: 40,
+            ),
+          ),
+          const SizedBox(height: 15),
+          Text(
+            'ALERT:',
+            style: TextStyle(
+                color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18), // White text
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            conclusionMessage,
+            style: TextStyle(
+                color: Colors.white, fontSize: 16), // White text
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+>>>>>>> 6240b91 (new updated)
   Widget _buildDashboard() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 30),
@@ -282,13 +458,21 @@ Widget build(BuildContext context) {
               Colors.brown, EducationalHomePage()),
           _itemDashboard('Feedback', CupertinoIcons.pencil, Colors.yellow,
               FeedbackPage(currentUserId: widget.currentUserId)),
+<<<<<<< HEAD
           _itemDashboard(
               'Community', CupertinoIcons.book, Colors.pink, CommunityScreen()),
+=======
+          _itemDashboard('Community', CupertinoIcons.book, 
+              Color.fromARGB(255, 33, 30, 233), CommunityScreen()),
+              // _itemDashboard('Report', CupertinoIcons.book, 
+              //  Colors.pink, ReportPage()),
+>>>>>>> 6240b91 (new updated)
         ],
       ),
     );
   }
 
+<<<<<<< HEAD
   Widget _buildBottomNavigationBar() {
     return BottomNavigationBar(
       backgroundColor: Colors.purple[200],
@@ -312,6 +496,41 @@ Widget build(BuildContext context) {
       type: BottomNavigationBarType.fixed,
     );
   }
+=======
+// Widget _buildBottomNavigationBar(BuildContext context) {
+//     return ConvexAppBar.badge(
+//       {0: '99+', 1: Icons.assistant_photo, 2: Colors.redAccent},
+//       items: [
+//         TabItem(icon: Icons.home, title: 'Home'),
+//         TabItem(icon: Icons.person, title: 'Profile'),
+//         TabItem(icon: Icons.car_crash_outlined, title: 'Vehicle Monitoring'),
+//       ],
+//       onTap: (int i) {
+//         switch (i) {
+//           case 0:
+//             Navigator.push(
+//               context,
+//               MaterialPageRoute(builder: (context) => HomePage()),
+//             );
+//             break;
+//           case 1:
+//             Navigator.push(
+//               context,
+//               MaterialPageRoute(builder: (context) => ProfilePage(currentUserId: '')),
+//             );
+//             break;
+//           case 2:
+//             Navigator.push(
+//               context,
+//               MaterialPageRoute(builder: (context) => VehicleMonitoringPage(sensorName: '')),
+//             );
+//             break;
+//         }
+//       },
+//     );
+//   }
+  
+>>>>>>> 6240b91 (new updated)
 
   Widget _itemDashboard(
       String title, IconData iconData, Color background, Widget nextPage) {
@@ -410,7 +629,11 @@ Widget build(BuildContext context) {
 
   Widget _temperatureIndicator() {
   Color indicatorColor;
+<<<<<<< HEAD
   if (_temperature > 40) {
+=======
+  if (_temperature > 38) {
+>>>>>>> 6240b91 (new updated)
     indicatorColor = Colors.red; // Hot
   } else if (_temperature < 15) {
     indicatorColor = Colors.yellow; // Cold
@@ -455,7 +678,11 @@ Widget build(BuildContext context) {
         ),
         const SizedBox(height: 4),
         Text(
+<<<<<<< HEAD
           _temperature > 40
+=======
+          _temperature > 38
+>>>>>>> 6240b91 (new updated)
               ? 'Hot'
               : (_temperature < 15 ? 'Cold' : 'Normal'),
           style: TextStyle(color: Colors.white),
@@ -465,4 +692,92 @@ Widget build(BuildContext context) {
   );
 }
 
+<<<<<<< HEAD
+=======
+Future<void> initiateSensorsAndNotifications(String userid) async {
+  ThingSpeakController thingSpeakController = ThingSpeakController();
+  TelegramController telegramController = TelegramController();
+
+  double? lastTemperature;
+  double? lastMotion;
+
+  // declare object for OneSignal notification
+  OneSignalController onesignal = new OneSignalController();
+  String title = "";
+  String message = "";
+  List<String> targetUser = [];
+
+  Timer.periodic(Duration(seconds: 5), (Timer timer) async {
+    // Read sensor data from ThingSpeak
+    Map<String, double> sensorData = await thingSpeakController.readSensorData();
+
+    if (sensorData.isNotEmpty) {
+      double temperature = sensorData['temperature']!;
+      double motion = sensorData['motion']!;
+
+      // Define the thresholds
+      double temperatureThreshold = 38.0;
+      double motionThreshold = 1.0;
+
+      // Check if the temperature exceeds the threshold and if it has changed
+      if (temperature > temperatureThreshold && temperature != lastTemperature) {
+        lastTemperature = temperature;
+        // setup notification config for OneSignal
+        title = "TEMPERATURE ALERT";
+        message = "🚨Temperature has exceeded the threshold";
+        targetUser.add(userid);
+
+        onesignal.SendNotification(title, message, targetUser);
+        
+        await sendTemperatureAlert(telegramController, temperature);
+      }
+
+      // Check if motion is detected and if it has changed
+      if (motion >= motionThreshold && motion != lastMotion) {
+        lastMotion = motion;
+        await sendMotionAlert(telegramController);
+
+         // setup notification config for OneSignal
+        title = "MOTION ALERT";
+        message = "🚨Motion has been detected!";
+        targetUser.add(userid);
+
+        onesignal.SendNotification(title, message, targetUser);
+      }
+
+      print("Temperature: $temperature, Motion: $motion");
+    } else {
+      print("Failed to retrieve sensor data.");
+      timer.cancel(); // Stop the timer if data retrieval fails
+    }
+  });
+}
+
+Future<void> sendTemperatureAlert(TelegramController telegramController, double temperature) async {
+  await telegramController.sendTelegramNotification(
+    "🚨 Temperature Alert: Temperature has exceeded the threshold: $temperature°C"
+  );
+
+  // Wait for 3 minutes before sending the reminder
+  await Future.delayed(Duration(minutes: 3));
+  
+  await telegramController.sendTelegramNotification(
+    "🔄 Reminder: High temperature still detected: $temperature°C"
+  );
+}
+
+Future<void> sendMotionAlert(TelegramController telegramController) async {
+  await telegramController.sendTelegramNotification(
+    "🚨 Motion Alert: Motion has been detected!"
+  );
+
+  // Wait for 3 minutes before sending the reminder
+  await Future.delayed(Duration(minutes: 3));
+  
+  await telegramController.sendTelegramNotification(
+    "🔄 Reminder: Motion has been detected!"
+  );
+}
+
+>>>>>>> 6240b91 (new updated)
 }

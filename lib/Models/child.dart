@@ -25,6 +25,16 @@ class ChildModel {
     };
   }
 
+
+// Factory constructor to create an instance from Firestore document
+  factory ChildModel.fromDocument(DocumentSnapshot<Map<String, dynamic>> doc) {
+    final data = doc.data()!;
+    return ChildModel(
+      id: doc.id,
+      childName: data['childName'] ?? '', childFullName: '', childGender: '', childAge: null, // Handle null case
+    );
+  }
+
   factory ChildModel.fromDoc(DocumentSnapshot doc) {
     Map<String, dynamic>? data = doc.data() as Map<String, dynamic>?;
 

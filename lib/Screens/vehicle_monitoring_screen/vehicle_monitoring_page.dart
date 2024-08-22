@@ -89,11 +89,15 @@ class _VehicleMonitoringPageState extends State<VehicleMonitoringPage> {
                   builder: (context) => ProfilePage(currentUserId: '')));
           break;
         case 2:
+<<<<<<< HEAD
           Navigator.push(
               context,
               MaterialPageRoute(
                   builder: (context) =>
                       VehicleMonitoringPage(sensorName: widget.sensorName)));
+=======
+          // Stay on the current page
+>>>>>>> 6240b91 (new updated)
           break;
         case 3:
           Navigator.push(
@@ -114,8 +118,12 @@ class _VehicleMonitoringPageState extends State<VehicleMonitoringPage> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
+<<<<<<< HEAD
             Navigator.push(
                 context, MaterialPageRoute(builder: (context) => HomePage()));
+=======
+            Navigator.pop(context);
+>>>>>>> 6240b91 (new updated)
           },
         ),
       ),
@@ -199,8 +207,12 @@ class _VehicleMonitoringPageState extends State<VehicleMonitoringPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
+<<<<<<< HEAD
                               builder: (context) =>
                                   IncidentHistoryPage()), // Navigate to the Incident History Page
+=======
+                              builder: (context) => IncidentHistoryPage()),
+>>>>>>> 6240b91 (new updated)
                         );
                       },
                       icon: Icon(Icons.history),
@@ -217,6 +229,7 @@ class _VehicleMonitoringPageState extends State<VehicleMonitoringPage> {
           ),
         ),
       ),
+<<<<<<< HEAD
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.purple[200],
         items: const <BottomNavigationBarItem>[
@@ -231,6 +244,8 @@ class _VehicleMonitoringPageState extends State<VehicleMonitoringPage> {
         onTap: _onItemTapped,
         type: BottomNavigationBarType.fixed,
       ),
+=======
+>>>>>>> 6240b91 (new updated)
     );
   }
 }
@@ -251,7 +266,11 @@ class SensorTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       elevation: 8,
+<<<<<<< HEAD
       margin: EdgeInsets.symmetric(vertical: 10),
+=======
+      margin: const EdgeInsets.symmetric(vertical: 10),
+>>>>>>> 6240b91 (new updated)
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -310,7 +329,11 @@ class TemperatureGauge extends StatelessWidget {
         axes: <RadialAxis>[
           RadialAxis(
             minimum: -10,
+<<<<<<< HEAD
             maximum: 50,
+=======
+            maximum: 45,
+>>>>>>> 6240b91 (new updated)
             ranges: <GaugeRange>[
               GaugeRange(
                 startValue: -10,
@@ -320,22 +343,35 @@ class TemperatureGauge extends StatelessWidget {
               ),
               GaugeRange(
                 startValue: 15,
+<<<<<<< HEAD
                 endValue: 40,
+=======
+                endValue: 38,
+>>>>>>> 6240b91 (new updated)
                 color: Colors.green[200],
                 label: 'Normal',
               ),
               GaugeRange(
+<<<<<<< HEAD
                 startValue: 40,
                 endValue: 50,
+=======
+                startValue: 38,
+                endValue: 45,
+>>>>>>> 6240b91 (new updated)
                 color: Colors.red[200],
                 label: 'Hot',
               ),
             ],
             pointers: <GaugePointer>[
+<<<<<<< HEAD
               NeedlePointer(
                   value: tempValue,
                   enableAnimation: true,
                   needleColor: Colors.purple),
+=======
+              NeedlePointer(value: tempValue),
+>>>>>>> 6240b91 (new updated)
             ],
             annotations: <GaugeAnnotation>[
               GaugeAnnotation(
@@ -343,9 +379,16 @@ class TemperatureGauge extends StatelessWidget {
                   child: Text(
                     '$temperature°C',
                     style: TextStyle(
+<<<<<<< HEAD
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                         color: Colors.black),
+=======
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.purple,
+                    ),
+>>>>>>> 6240b91 (new updated)
                   ),
                 ),
                 angle: 90,
@@ -382,6 +425,7 @@ class MotionIndicator extends StatelessWidget {
           ),
         ],
       ),
+<<<<<<< HEAD
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -397,6 +441,17 @@ class MotionIndicator extends StatelessWidget {
                 fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
           ),
         ],
+=======
+      child: Center(
+        child: Text(
+          isMotionDetected ? 'Motion Detected' : 'No Motion',
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: isMotionDetected ? Colors.red : Colors.green,
+          ),
+        ),
+>>>>>>> 6240b91 (new updated)
       ),
     );
   }
