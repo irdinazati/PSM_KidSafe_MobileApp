@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-<<<<<<< HEAD
-=======
 import 'package:fyp3/Screens/home_screen/homepage.dart';
 import 'package:fyp3/Screens/profile_screen/profile_page.dart';
 import 'package:fyp3/Screens/vehicle_monitoring_screen/vehicle_monitoring_page.dart';
->>>>>>> 6240b91 (new updated)
 
 class ReplyScreen extends StatefulWidget {
   final String postId;

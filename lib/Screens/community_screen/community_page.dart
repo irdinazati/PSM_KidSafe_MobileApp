@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-<<<<<<< HEAD
-=======
 import 'package:fyp3/Screens/home_screen/homepage.dart';
 import 'package:fyp3/Screens/profile_screen/profile_page.dart';
 import 'package:fyp3/Screens/vehicle_monitoring_screen/vehicle_monitoring_page.dart';
->>>>>>> 6240b91 (new updated)
 import 'post_screen.dart';
 import 'post_widget.dart';
 
@@ -43,13 +40,6 @@ class _CommunityScreenState extends State<CommunityScreen> {
         ),
       ),
       body: StreamBuilder<QuerySnapshot>(
-<<<<<<< HEAD
-        stream: FirebaseFirestore.instance
-            .collection('posts')
-            .where('title', isGreaterThanOrEqualTo: _searchKeyword)
-            .where('title', isLessThanOrEqualTo: '$_searchKeyword\uf8ff')
-            .snapshots(),
-=======
         stream: (_searchKeyword.isEmpty)
             ? FirebaseFirestore.instance
                 .collection('posts')
@@ -61,7 +51,6 @@ class _CommunityScreenState extends State<CommunityScreen> {
                 .where('title', isLessThanOrEqualTo: '$_searchKeyword\uf8ff')
                 .orderBy('title')
                 .snapshots(),
->>>>>>> 6240b91 (new updated)
         builder: (context, titleSnapshot) {
           if (titleSnapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
@@ -80,12 +69,8 @@ class _CommunityScreenState extends State<CommunityScreen> {
                 postId: post.id,
                 postData: post.data() as Map<String, dynamic>,
                 currentUserId: widget.currentUserId,
-<<<<<<< HEAD
-                timestamp: post['timestamp'], // Pass the timestamp to PostWidget
-=======
                 timestamp:
                     post['timestamp'], // Pass the timestamp to PostWidget
->>>>>>> 6240b91 (new updated)
               );
             },
           );

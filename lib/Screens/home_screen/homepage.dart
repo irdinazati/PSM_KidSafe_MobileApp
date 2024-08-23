@@ -1,8 +1,5 @@
 import 'dart:async';
-<<<<<<< HEAD
-=======
 import 'package:cloud_firestore/cloud_firestore.dart';
->>>>>>> 6240b91 (new updated)
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fyp3/Screens/community_screen/community_page.dart';
@@ -13,13 +10,9 @@ import 'package:fyp3/Screens/settings_screen/settings_page.dart';
 import 'package:fyp3/Screens/vehicle_monitoring_screen/vehicle_monitoring_page.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-<<<<<<< HEAD
-import '../child_screen/child_homepage.dart';
-=======
 import '../../Controller/OneSignalController.dart';
 import '../child_screen/child_homepage.dart';
 import '../notification_screen/controllers.dart';
->>>>>>> 6240b91 (new updated)
 
 class HomePage extends StatefulWidget {
   final String? currentUserId;
@@ -37,80 +30,6 @@ class _HomePageState extends State<HomePage> {
   double _temperature = 0.0; // Initialize with a default temperature
   Timer? _timer; // Timer instance for the message sending duration
   bool _isLoading = true; // Add this to your state
-<<<<<<< HEAD
-
-  @override
-  void initState() {
-    super.initState();
-    fetchThingSpeakData(); // Fetch data when the widget is initialized
-  }
-
-
-
-  Future<void> fetchThingSpeakData() async {
-    final String url =
-        'https://api.thingspeak.com/channels/2554215/feeds.json?api_key=GQXZ7HQWUIPKL9I8&results=1';
-
-    try {
-      final response = await http.get(Uri.parse(url));
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        setState(() {
-          _motionStatus =
-              int.parse(data['feeds'][0]['field2']); // Adjust as needed
-          _temperature =
-              double.parse(data['feeds'][0]['field1']); // Adjust as needed
-          _isLoading = false; // Data loaded successfully
-        });
-      } else {
-        throw Exception('Failed to load data');
-      }
-    } catch (e) {
-      print(e);
-      // Handle error by showing a snackbar
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error fetching data: $e')),
-      );
-      setState(() {
-        _isLoading = false; // Stop loading on error
-      });
-    }
-  }
-
-  void _onItemTapped(int index) {
-    if (index != _selectedIndex) {
-      setState(() {
-        _selectedIndex = index;
-      });
-      switch (index) {
-        case 0:
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-                builder: (context) =>
-                    HomePage(currentUserId: widget.currentUserId)),
-          );
-          break;
-        case 1:
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-                builder: (context) => ProfilePage(currentUserId: '')),
-          );
-          break;
-        case 2:
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-                builder: (context) => VehicleMonitoringPage(sensorName: '')),
-          );
-          break;
-      }
-    }
-  }
-
-  @override
-=======
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   @override
@@ -194,7 +113,6 @@ Future<void> fetchThingSpeakData() async {
   // }
 
  @override
->>>>>>> 6240b91 (new updated)
 Widget build(BuildContext context) {
   return Scaffold(
     body: _isLoading
@@ -203,21 +121,14 @@ Widget build(BuildContext context) {
             padding: EdgeInsets.zero,
             children: [
               _buildAppBar(context),
-<<<<<<< HEAD
-=======
               const SizedBox(height: 30),
               _buildConclusion(),
->>>>>>> 6240b91 (new updated)
               _buildIndicators(),
               _buildImage(),
               _buildDashboard(),
               const SizedBox(height: 20),
             ],
           ),
-<<<<<<< HEAD
-    bottomNavigationBar: _buildBottomNavigationBar(),
-=======
->>>>>>> 6240b91 (new updated)
   );
 }
 
@@ -300,10 +211,7 @@ Widget build(BuildContext context) {
             ),
           ],
         ),
-<<<<<<< HEAD
-=======
         
->>>>>>> 6240b91 (new updated)
         child: Column(
           children: [
             Row(
@@ -365,8 +273,6 @@ Widget build(BuildContext context) {
     );
   }
 
-<<<<<<< HEAD
-=======
   Widget _buildConclusion() {
   String conclusionMessage;
   IconData alertIcon;
@@ -431,7 +337,6 @@ Widget build(BuildContext context) {
   );
 }
 
->>>>>>> 6240b91 (new updated)
   Widget _buildDashboard() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 30),
@@ -458,45 +363,15 @@ Widget build(BuildContext context) {
               Colors.brown, EducationalHomePage()),
           _itemDashboard('Feedback', CupertinoIcons.pencil, Colors.yellow,
               FeedbackPage(currentUserId: widget.currentUserId)),
-<<<<<<< HEAD
-          _itemDashboard(
-              'Community', CupertinoIcons.book, Colors.pink, CommunityScreen()),
-=======
           _itemDashboard('Community', CupertinoIcons.book, 
               Color.fromARGB(255, 33, 30, 233), CommunityScreen()),
               // _itemDashboard('Report', CupertinoIcons.book, 
               //  Colors.pink, ReportPage()),
->>>>>>> 6240b91 (new updated)
         ],
       ),
     );
   }
 
-<<<<<<< HEAD
-  Widget _buildBottomNavigationBar() {
-    return BottomNavigationBar(
-      backgroundColor: Colors.purple[200],
-      items: const <BottomNavigationBarItem>[
-        BottomNavigationBarItem(
-          icon: Icon(Icons.home),
-          label: 'Home',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.person),
-          label: 'Profile',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.car_crash_outlined),
-          label: 'Vehicle Monitoring',
-        ),
-      ],
-      currentIndex: _selectedIndex,
-      selectedItemColor: Colors.white,
-      onTap: _onItemTapped,
-      type: BottomNavigationBarType.fixed,
-    );
-  }
-=======
 // Widget _buildBottomNavigationBar(BuildContext context) {
 //     return ConvexAppBar.badge(
 //       {0: '99+', 1: Icons.assistant_photo, 2: Colors.redAccent},
@@ -530,7 +405,6 @@ Widget build(BuildContext context) {
 //     );
 //   }
   
->>>>>>> 6240b91 (new updated)
 
   Widget _itemDashboard(
       String title, IconData iconData, Color background, Widget nextPage) {
@@ -629,11 +503,7 @@ Widget build(BuildContext context) {
 
   Widget _temperatureIndicator() {
   Color indicatorColor;
-<<<<<<< HEAD
-  if (_temperature > 40) {
-=======
   if (_temperature > 38) {
->>>>>>> 6240b91 (new updated)
     indicatorColor = Colors.red; // Hot
   } else if (_temperature < 15) {
     indicatorColor = Colors.yellow; // Cold
@@ -678,11 +548,7 @@ Widget build(BuildContext context) {
         ),
         const SizedBox(height: 4),
         Text(
-<<<<<<< HEAD
-          _temperature > 40
-=======
           _temperature > 38
->>>>>>> 6240b91 (new updated)
               ? 'Hot'
               : (_temperature < 15 ? 'Cold' : 'Normal'),
           style: TextStyle(color: Colors.white),
@@ -692,8 +558,6 @@ Widget build(BuildContext context) {
   );
 }
 
-<<<<<<< HEAD
-=======
 Future<void> initiateSensorsAndNotifications(String userid) async {
   ThingSpeakController thingSpeakController = ThingSpeakController();
   TelegramController telegramController = TelegramController();
@@ -779,5 +643,4 @@ Future<void> sendMotionAlert(TelegramController telegramController) async {
   );
 }
 
->>>>>>> 6240b91 (new updated)
 }
